@@ -1,17 +1,24 @@
 package com.moorabi.springboot.crudrestfulwebservices.model;
 
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name="users")
@@ -21,19 +28,35 @@ public class User {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	
+	
 	@Column(name = "first_name")
 	private String firstName;
 	
 	@Column(name = "last_name")
 	private String lastName;
 	
+	@NotBlank
+	@Size(max = 20)
+	@Column(name = "user_name")
+	private String username;
+	
+	@NotBlank
 	@Column(name = "email_id")
 	private String emailId;
+	
+	@NotBlank
+	@Size(max = 120)
+	@Column(name = "password")
+	private String password;
+
+	@Column(name = "authorities")
+	private String authorities;
 	
 	@OneToMany (mappedBy = "user" ,cascade = CascadeType.ALL)
 	private List<Reel> reels;
 
-
+	
+	
 
 	public List<Reel> getReels() {
 		return reels;
@@ -44,18 +67,43 @@ public class User {
 		
 	}
 	
-	
-	
-	public User(String firstName, String lastName, String emailId, List<Reel> reels) {
-		this.firstName = firstName;
-		this.lastName = lastName;
+
+	public User(@NotBlank @Size(max = 20) String username, @NotBlank String emailId,
+			@NotBlank @Size(max = 120) String password) {
+		this.username = username;
 		this.emailId = emailId;
-		this.reels = reels;
+		this.password = password;
+	}
+
+	public String getEmailId() {
+		return emailId;
+	}
+
+	public void setEmailId(String emailId) {
+		this.emailId = emailId;
 	}
 
 
+	public String getUsername() {
+		return username;
+	}
 
 
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+
+	public String getPassword() {
+		return password;
+	}
+
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
+	
 	public long getId() {
 		return id;
 	}
@@ -80,12 +128,22 @@ public class User {
 		this.lastName = lastName;
 	}
 
-	public String getEmailId() {
-		return emailId;
+
+	public void setReels(List<Reel> reels) {
+		this.reels = reels;
 	}
 
-	public void setEmailId(String emailId) {
-		this.emailId = emailId;
+
+
+
+	public String getAuthorities() {
+		return authorities;
 	}
+
+
+	public void setAuthorities(String authorities) {
+		this.authorities = authorities;
+	}
+	
 	
 }

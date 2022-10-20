@@ -71,13 +71,14 @@ public class Reel {
 		this.id = id;
 	}
 
-	public long getUser() {
-		return user.getId();
+	public String getUser() {
+		return user.getUsername()+" "+user.getFirstName()+" "+user.getLastName();
 	}
 
 	public void setUser(User user) {
 		this.user = user;
 	}
+	
 
 	public String getCountry() {
 		return country;

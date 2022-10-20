@@ -1,81 +1,67 @@
-//package com.moorabi.springboot.crudrestfulwebservices.config;
-//
-//
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.context.annotation.Bean;
-//import org.springframework.context.annotation.Configuration;
-//import org.springframework.security.authentication.AuthenticationManager;
-//import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-//import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-//import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-//import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-//import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-//import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-//import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-//import org.springframework.security.config.http.SessionCreationPolicy;
-//import org.springframework.security.core.userdetails.UserDetailsService;
-//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-//import org.springframework.security.crypto.password.PasswordEncoder;
-//import org.springframework.security.web.SecurityFilterChain;
-//import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-//
-//@Configuration
-//@EnableGlobalMethodSecurity(prePostEnabled = true)
-//public class WebSecurityConfig  {
-//
-//	@Autowired
-//	private JwtAuthenticationEntryPoint unauthorizedHandler;
-//
-//	@Autowired
-//	private UserDetailsService jwtUserDetailsService;
-//
-//
-//
-//	  @Bean
-//	  public AuthTokenFilter authenticationJwtTokenFilter() {
-//	    return new AuthTokenFilter();
-//	  }
-//
-//	@Bean
-//	  public DaoAuthenticationProvider authenticationProvider() {
-//	      DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-//	       
-//	      authProvider.setUserDetailsService(jwtUserDetailsService);
-//	      authProvider.setPasswordEncoder(passwordEncoder());
-//	   
-//	      return authProvider;
-//	  }
-//
-//	
-//
-//	@Bean
-//	  public WebSecurityCustomizer webSecurityCustomizer() {
-//	    return (web) -> web.ignoring().antMatchers("/js/**", "/images/**"); 
-//	  }
-//	
-//	@Bean
-//	public PasswordEncoder passwordEncoder() {
-//		return new BCryptPasswordEncoder();
-//	}
-//
-//	@Bean
-//	  public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfiguration) throws Exception {
-//	    return authConfiguration.getAuthenticationManager();
-//	  }
-//
-//
-//
-//	  @Bean
-//	  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-//	    http.cors().and().csrf().disable()
-//	        .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-//	        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-//	        .authorizeRequests().antMatchers("/api/auth/**").permitAll()
-//	        .antMatchers("/api/test/**").permitAll()
-//	        .anyRequest().authenticated();
-//	
-//	    http.authenticationProvider(authenticationProvider());
-//	    http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);	    
-//	    return http.build();
-//	  }
-//}
+package com.moorabi.springboot.crudrestfulwebservices.config;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.moorabi.springboot.crudrestfulwebservices.util.JwtRequestFilter;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@SuppressWarnings("deprecation")
+@Configuration
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private final UserDetailsService jwtUserDetailsService;
+    private final JwtRequestFilter jwtRequestFilter;
+
+    public WebSecurityConfig(UserDetailsService jwtUserDetailsService, JwtRequestFilter jwtRequestFilter) {
+        this.jwtUserDetailsService = jwtUserDetailsService;
+        this.jwtRequestFilter = jwtRequestFilter;
+    }
+
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(jwtUserDetailsService).passwordEncoder(new BCryptPasswordEncoder());
+    }
+
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+
+    @Override
+    protected void configure(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity.csrf().disable()
+        .authorizeRequests()
+        .antMatchers("/auth/*").permitAll()
+        .anyRequest().authenticated()
+        .and()
+        .exceptionHandling()
+        .authenticationEntryPoint((request, response, authException) -> {
+            Map<String, Object> responseMap = new HashMap<>();
+            ObjectMapper mapper = new ObjectMapper();
+            response.setStatus(401);
+            responseMap.put("error", true);
+            responseMap.put("message", "Unauthorized");
+            response.setHeader("content-type", "application/json");
+            String responseMsg = mapper.writeValueAsString(responseMap);
+            response.getWriter().write(responseMsg);
+        }).and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+    }
+}

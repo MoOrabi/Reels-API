@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,11 +43,13 @@ public class UserController {
 	}
 	
 	@PutMapping("/users/{id}")
-	public ResponseEntity<User> updateUser(@PathVariable(value="id") long id,@RequestBody User userDetails) throws ResourceNotFoundException {
+	public ResponseEntity<User> updateUser(@PathVariable(value="id") long id,@RequestBody User user) throws ResourceNotFoundException {
 		User u=userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found for this id : "+id));
-		u.setFirstName(userDetails.getFirstName());
-		u.setLastName(userDetails.getLastName());
-		u.setEmailId(userDetails.getEmailId());
+		u.setFirstName(user.getFirstName());
+		u.setLastName(user.getLastName());
+		u.setUsername(user.getUsername());
+		u.setEmailId(user.getEmailId());
+		u.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
 		userRepository.save(u);
 		return ResponseEntity.ok().body(u);
 	}
