@@ -11,9 +11,10 @@ public class ErrorDetails extends Exception{
 	private LocalDate timestamp;
 	private String message;
 	private String details;
+	
 
 	public ErrorDetails(LocalDate localDate, String message, String details) {
-		super();
+		super(message);
 		this.timestamp = localDate;
 		this.message = message;
 		this.details = details;

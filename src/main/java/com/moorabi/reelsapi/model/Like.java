@@ -56,6 +56,10 @@ public class Like {
 		return user.getId();
 	}
 
+//	public User getUserA() {
+//		return user;
+//	}
+	
 	public void setUser(User user) {
 		this.user = user;
 	}

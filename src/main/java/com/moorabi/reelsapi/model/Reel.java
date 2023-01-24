@@ -14,6 +14,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 @Entity
 @Table(name= "reels")
 public class Reel {
@@ -21,6 +23,7 @@ public class Reel {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	
+//	@JsonManagedReference
 	@ManyToOne(cascade = {CascadeType.DETACH,
 			  CascadeType.PERSIST,
 			  CascadeType.MERGE,
@@ -40,9 +43,11 @@ public class Reel {
 	@Column(name = "video")
 	private File videoFile;
 
+//	@JsonManagedReference
 	@OneToMany(mappedBy = "reel", cascade = CascadeType.ALL)
 	private List<Comment> comments;
 	
+//	@JsonManagedReference
 	@OneToMany(mappedBy = "reel", cascade = CascadeType.ALL)
 	private List<Like> likes;
 	
@@ -72,6 +77,10 @@ public class Reel {
 
 	public String getUser() {
 		return user.getUsername()+" "+user.getFirstName()+" "+user.getLastName();
+	}
+	
+	public long getUserId() {
+		return user.getId();
 	}
 
 	public void setUser(User user) {

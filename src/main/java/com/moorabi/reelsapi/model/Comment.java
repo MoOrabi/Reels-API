@@ -1,6 +1,5 @@
 package com.moorabi.reelsapi.model;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,6 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name="comments")
@@ -31,10 +32,12 @@ public class Comment {
 	@Column(name="description")
 	private String description;
 	
+//	@JsonManagedReference
 	@ManyToOne 
 	@JoinColumn(name= "reel_commented")
 	private Reel reel;
 	
+//	@JsonManagedReference
 	@ManyToOne 
 	@JoinColumn(name= "user_comments")
 	private User user;
@@ -66,6 +69,10 @@ public class Comment {
 	public long getUser() {
 		return user.getId();
 	}
+	
+//	public User getUserA() {
+//		return user;
+//	}
 
 	public void setUser(User user) {
 		this.user = user;

@@ -1,7 +1,5 @@
 package com.moorabi.reelsapi.controller;
 
-import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.moorabi.reelsapi.exception.ErrorDetails;
+import com.moorabi.reelsapi.exception.DuplicatedException;
 import com.moorabi.reelsapi.exception.ResourceNotFoundException;
 import com.moorabi.reelsapi.model.Like;
 import com.moorabi.reelsapi.model.Reel;
@@ -49,8 +47,8 @@ public class LikeController {
 	}
 	
 	@PostMapping("/reels/{reel_id}/like")
-	public Like postLike(@PathVariable(value="reel_id") long reel_id,
-			@RequestHeader (name="Authorization") String token) throws Exception {
+	public Like postLike(@RequestHeader (name="Authorization") String token,
+			@PathVariable(value="reel_id") long reel_id) throws DuplicatedException {
 		String userName=jwtTokenUtil.getUsernameFromToken(token.split(" ")[1]);
 		
 		Reel r=reelRepository.findById(reel_id).get();
@@ -58,21 +56,21 @@ public class LikeController {
 		Like like=new Like(r, u);
 		if(likeRepository.findLike(r, u)==null) {
 			likeRepository.save(like);
-			r.getLikes().add(like);
-			reelRepository.save(r);
 			return like;
 		}else {
-			throw new ErrorDetails(LocalDate.now(),"Duplicated Like","You already liked these reel");
+			throw new DuplicatedException("You Already Liked This");
 		}
 		
 	}
 
 
 	
-	@DeleteMapping("/reels/{reel_id}/users/{user_id}/like")
-	public ResponseEntity<?> deleteLike(@PathVariable(value="user_id") long user_id,@PathVariable(value="reel_id") long reel_id) throws ResourceNotFoundException {
+	@DeleteMapping("/reels/{reel_id}/like")
+	public ResponseEntity<?> deleteLike(@RequestHeader (name="Authorization") String token,
+			@PathVariable(value="reel_id") long reel_id) throws ResourceNotFoundException {
+		String userName=jwtTokenUtil.getUsernameFromToken(token.split(" ")[1]);
 		Reel r=reelRepository.findById(reel_id).get();
-		User u=userRepository.findById(user_id).get();
+		User u=userRepository.findUserByUsername(userName);
 		if(likeRepository.findLike(r, u)!=null) {
 			Like l=likeRepository.findLike(r, u);
 			likeRepository.delete(l);

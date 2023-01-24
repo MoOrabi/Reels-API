@@ -12,19 +12,23 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.moorabi.reelsapi.exception.ResourceNotFoundException;
-import com.moorabi.reelsapi.model.Reel;
 import com.moorabi.reelsapi.model.User;
 import com.moorabi.reelsapi.repository.UserRepository;
+import com.moorabi.reelsapi.util.JwtTokenUtil;
 
 @RestController
 @RequestMapping("/api/v1")
 public class UserController {
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private JwtTokenUtil jwtTokenUtil;
 	
 	@GetMapping("/users")
 	public List<User> getAllUsers(){
@@ -42,15 +46,21 @@ public class UserController {
 		return ResponseEntity.ok().body(u);
 	}
 	
-//	@GetMapping("users/{userName}")
-//	public ResponseEntity<User> getUserByUserName(@PathVariable(value="userName") String userName) throws ResourceNotFoundException{
-//		User u=userRepository.findUserByUsername(userName).orElseThrow(() -> new ResourceNotFoundException("User not found for this id : "+userName));
-//		return ResponseEntity.ok().body(u);
-//	}
+	@GetMapping("users/{userName}")
+	public ResponseEntity<User> getUserByUserName(@PathVariable(value="userName") String userName) throws ResourceNotFoundException{
+		User u=userRepository.findUserByUsername(userName);
+		if(u==null) {
+			throw new ResourceNotFoundException("User not found for this user name : "+userName);
+		}
+		
+		return ResponseEntity.ok().body(u);
+	}
 	
 	@PutMapping("/users/{id}")
-	public ResponseEntity<User> updateUser(@PathVariable(value="id") long id,@RequestBody User user) throws ResourceNotFoundException {
-		User u=userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found for this id : "+id));
+	public ResponseEntity<User> updateUser(@RequestHeader (name="Authorization") String token
+			,@RequestBody User user) throws ResourceNotFoundException {
+		String userName=jwtTokenUtil.getUsernameFromToken(token.split(" ")[1]);
+		User u=(userRepository.findUserByUsername(userName));
 		u.setFirstName(user.getFirstName());
 		u.setLastName(user.getLastName());
 		u.setUsername(user.getUsername());
@@ -60,10 +70,11 @@ public class UserController {
 		return ResponseEntity.ok().body(u);
 	}
 	
-	@DeleteMapping("/users/{id}")
-	public ResponseEntity<?> deleteUser(@PathVariable(value="id") long id) throws ResourceNotFoundException {
-		User u=userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found for this id : "+id));
-		userRepository.deleteById(id);
+	@DeleteMapping("/users")
+	public ResponseEntity<?> deleteUser(@RequestHeader (name="Authorization") String token) throws ResourceNotFoundException {
+		String userName=jwtTokenUtil.getUsernameFromToken(token.split(" ")[1]);
+		User u=(userRepository.findUserByUsername(userName));
+		userRepository.deleteById(u.getId());
 		return ResponseEntity.ok().build();
 	}
 }
