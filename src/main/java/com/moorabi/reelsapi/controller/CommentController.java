@@ -3,6 +3,7 @@ package com.moorabi.reelsapi.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.moorabi.reelsapi.exception.ErrorDetails;
+import com.moorabi.reelsapi.exception.Errors;
 import com.moorabi.reelsapi.exception.NotAllowedException;
 import com.moorabi.reelsapi.exception.ResourceNotFoundException;
 import com.moorabi.reelsapi.model.Comment;
@@ -57,7 +60,7 @@ public class CommentController {
 
 
 	@PutMapping("/reels/{reel_id}/comments/{comment_id}")
-	public ResponseEntity<Comment> updateComment(@RequestHeader (name="Authorization") String token,
+	public ResponseEntity<?> updateComment(@RequestHeader (name="Authorization") String token,
 			@PathVariable(value="reel_id") long reel_id,
 			@PathVariable(value="comment_id") long comment_id,
 			@RequestBody Comment commentDetails) throws ResourceNotFoundException, NotAllowedException {
@@ -66,7 +69,7 @@ public class CommentController {
 		User u=(userRepository.findById(c.getUser()))
 				.orElseThrow(() -> new ResourceNotFoundException("User not found for this user name : "+userName));;
 		if(!u.getUsername().equals(userName)) {
-			throw new NotAllowedException("Only Owner of reel can update it");
+			return new ResponseEntity<ErrorDetails>(new ErrorDetails(Errors.NOT_ALLOWED,"Only Owner of comment can update it"),HttpStatus.UNAUTHORIZED);
 		}
 		Reel r=reelRepository.findById(reel_id).get();
 		if(commentDetails.getDescription()!=null)
@@ -84,11 +87,10 @@ public class CommentController {
 
 		Comment c= commentRepository.findById(comment_id)
 				.orElseThrow(() -> new ResourceNotFoundException("Comment not found for this id : "+comment_id));
-//		Reel r=reelRepository.findById(reel_id).get();
 		User u=(userRepository.findById(c.getUser()))
 				.orElseThrow(() -> new ResourceNotFoundException("User not found for this user name : "+userName));;
 		if(!u.getUsername().equals(userName)) {
-			throw new NotAllowedException("Only Owner of reel can delete it");
+			return new ResponseEntity<ErrorDetails>(new ErrorDetails(Errors.NOT_ALLOWED,"Only Owner of comment can delete it"),HttpStatus.UNAUTHORIZED);
 		}
 		commentRepository.deleteById(comment_id);
 		return ResponseEntity.ok().build();

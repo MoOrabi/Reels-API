@@ -3,6 +3,7 @@ package com.moorabi.reelsapi.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.moorabi.reelsapi.exception.DuplicatedException;
+import com.moorabi.reelsapi.exception.ErrorDetails;
+import com.moorabi.reelsapi.exception.Errors;
 import com.moorabi.reelsapi.exception.ResourceNotFoundException;
 import com.moorabi.reelsapi.model.Like;
 import com.moorabi.reelsapi.model.Reel;
@@ -47,7 +50,7 @@ public class LikeController {
 	}
 	
 	@PostMapping("/reels/{reel_id}/like")
-	public Like postLike(@RequestHeader (name="Authorization") String token,
+	public ResponseEntity<?> postLike(@RequestHeader (name="Authorization") String token,
 			@PathVariable(value="reel_id") long reel_id) throws DuplicatedException {
 		String userName=jwtTokenUtil.getUsernameFromToken(token.split(" ")[1]);
 		
@@ -56,9 +59,10 @@ public class LikeController {
 		Like like=new Like(r, u);
 		if(likeRepository.findLike(r, u)==null) {
 			likeRepository.save(like);
-			return like;
+			return ResponseEntity.ok(like);
 		}else {
-			throw new DuplicatedException("You Already Liked This");
+			return new ResponseEntity<ErrorDetails>(new ErrorDetails(Errors.BAD_REQUEST,"You Already Liked This"),HttpStatus.UNAUTHORIZED);
+					
 		}
 		
 	}
@@ -74,6 +78,8 @@ public class LikeController {
 		if(likeRepository.findLike(r, u)!=null) {
 			Like l=likeRepository.findLike(r, u);
 			likeRepository.delete(l);
+		}else {
+			return new ResponseEntity<ErrorDetails>(new ErrorDetails(Errors.NOT_FOUND,"You didn't like that reel"),HttpStatus.UNAUTHORIZED);
 		}
 		
 		return ResponseEntity.ok().build();

@@ -1,34 +1,37 @@
 package com.moorabi.reelsapi.exception;
 
 import java.time.LocalDate;
-import java.util.Date;
 
-public class ErrorDetails extends Exception{
+public class ErrorDetails {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
 	private LocalDate timestamp;
+	private String code;
 	private String message;
 	private String details;
 	
+	public ErrorDetails(Errors errors,String details) {
+		this.timestamp = LocalDate.now();
+		this.code = errors.getCode();
+		this.message = errors.getMessage();
+		this.details=details;
+	}
 
-	public ErrorDetails(LocalDate localDate, String message, String details) {
-		super(message);
-		this.timestamp = localDate;
-		this.message = message;
-		this.details = details;
+
+	public String getDetails() {
+		return details;
 	}
 
 	public LocalDate getTimestamp() {
 		return timestamp;
 	}
 
-	public String getMessage() {
-		return message;
+	public String getCode() {
+		return code;
 	}
 
-	public String getDetails() {
-		return details;
+	public String getMessage() {
+		return message;
 	}
 }

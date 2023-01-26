@@ -3,6 +3,7 @@ package com.moorabi.reelsapi.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.moorabi.reelsapi.exception.ErrorDetails;
+import com.moorabi.reelsapi.exception.Errors;
 import com.moorabi.reelsapi.exception.NotAllowedException;
 import com.moorabi.reelsapi.exception.ResourceNotFoundException;
 import com.moorabi.reelsapi.model.Reel;
@@ -40,7 +43,7 @@ public class ReelController {
 		return reelRepository.findAll();
 	}
 	
-	@PostMapping("/reels/{userId}")
+	@PostMapping("/reels")
 	public Reel createReel(@RequestHeader (name="Authorization") String token,
 			@RequestBody Reel reel) {
 		String userName=jwtTokenUtil.getUsernameFromToken(token.split(" ")[1]);
@@ -70,7 +73,7 @@ public class ReelController {
 	}
 	
 	@PutMapping("reels/{reel_id}")
-	public ResponseEntity<Reel> updateReel(@RequestHeader (name="Authorization") String token,
+	public ResponseEntity<?> updateReel(@RequestHeader (name="Authorization") String token,
 			@PathVariable(value="reel_id") long reelId,
 			@RequestBody Reel reelDetails) throws ResourceNotFoundException, NotAllowedException {
 		String userName=jwtTokenUtil.getUsernameFromToken(token.split(" ")[1]);
@@ -78,7 +81,7 @@ public class ReelController {
 		User u=(userRepository.findById(r.getUserId()))
 				.orElseThrow(() -> new ResourceNotFoundException("User not found for this user name : "+userName));;
 		if(!u.getUsername().equals(userName)) {
-			throw new NotAllowedException("Only Owner of reel can update it");
+			return new ResponseEntity<ErrorDetails>(new ErrorDetails(Errors.NOT_ALLOWED,"Only Owner of reel can delete it"),HttpStatus.UNAUTHORIZED);
 		}
 		if(reelDetails.getCountry()!=null)
 			r.setCountry(reelDetails.getCountry());
@@ -99,7 +102,7 @@ public class ReelController {
 		User u=(userRepository.findById(r.getUserId()))
 				.orElseThrow(() -> new ResourceNotFoundException("User not found for this user name : "+userName));;
 		if(!u.getUsername().equals(userName)) {
-			throw new NotAllowedException("Only Owner of reel can delete it");
+			return new ResponseEntity<ErrorDetails>(new ErrorDetails(Errors.NOT_ALLOWED,"Only Owner of reel can delete it"),HttpStatus.UNAUTHORIZED);
 		}
 		reelRepository.deleteById(reelId);
 		return ResponseEntity.ok().build();

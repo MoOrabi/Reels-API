@@ -20,6 +20,7 @@ public class JwtTokenUtil implements Serializable {
     public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
 
     Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    String keyss="SECRET";
 
     public String getUsernameFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
@@ -40,7 +41,7 @@ public class JwtTokenUtil implements Serializable {
     }
 
     private Claims getAllClaimsFromToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+        return Jwts.parserBuilder().setSigningKey(key.getEncoded()).build().parseClaimsJws(token).getBody();
     }
 
     private Boolean isTokenExpired(String token) {
