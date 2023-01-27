@@ -17,7 +17,12 @@ import java.util.function.Function;
 @Component
 public class JwtTokenUtil implements Serializable {
 
-    public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
 
     Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     String keyss="SECRET";

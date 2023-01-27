@@ -3,7 +3,6 @@ package com.moorabi.reelsapi.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,96 +14,54 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.moorabi.reelsapi.exception.ErrorDetails;
-import com.moorabi.reelsapi.exception.Errors;
-import com.moorabi.reelsapi.exception.NotAllowedException;
 import com.moorabi.reelsapi.exception.ResourceNotFoundException;
 import com.moorabi.reelsapi.model.Reel;
-import com.moorabi.reelsapi.model.User;
-import com.moorabi.reelsapi.repository.ReelRepository;
-import com.moorabi.reelsapi.repository.UserRepository;
-import com.moorabi.reelsapi.util.JwtTokenUtil;
+import com.moorabi.reelsapi.service.ReelService;
 
 @RestController
 @RequestMapping("/api/v1")
 public class ReelController {
 	
 	@Autowired
-	private ReelRepository reelRepository;
-	
-	@Autowired
-	private UserRepository userRepository;
-	
-	@Autowired
-	private JwtTokenUtil jwtTokenUtil;
+	private ReelService reelService;
 	
 	@GetMapping("/reels")
 	public List<Reel> getAllReels(){
-		return reelRepository.findAll();
+		return reelService.getAllReels();	
 	}
 	
 	@PostMapping("/reels")
 	public Reel createReel(@RequestHeader (name="Authorization") String token,
 			@RequestBody Reel reel) {
-		String userName=jwtTokenUtil.getUsernameFromToken(token.split(" ")[1]);
-		User u=userRepository.findUserByUsername(userName);
-		u.getReels().add(reel);
-		reel.setUser(u);
-		return reelRepository.save(reel);
+		return reelService.createReel(token, reel);
 	}
 	
 	@GetMapping("reels/users/{user_id}")
 	public ResponseEntity<List<Reel>> getReelsByUserId(@PathVariable(value="user_id") long id) throws ResourceNotFoundException{
-		User u=userRepository.findById(id).get();
-		List<Reel> r=reelRepository.findByUser(u);
-		return ResponseEntity.ok().body(r);
+		return reelService.getReelsByUserId(id);
 	}
 	
 	@GetMapping("reels/{country}/{city}")
 	public ResponseEntity<List<Reel>> getReelsByCity(@PathVariable(value="country") String country,@PathVariable(value="city") String city) throws ResourceNotFoundException{
-		List<Reel> r=reelRepository.findReelsByCity(country,city);
-		return ResponseEntity.ok().body(r);
+		return reelService.getReelsByCity(country, city);
 	}
 	
 	@GetMapping("users/{user_id}/reels/{reel_id}")
-	public ResponseEntity<Reel> getReelById(@PathVariable(value="reel_id") long reelId) throws ResourceNotFoundException{
-		Reel r=reelRepository.findById(reelId).get();
-		return ResponseEntity.ok().body(r);
+	public ResponseEntity<Reel> getReelById(@PathVariable(value="reel_id") long reelId) throws ResourceNotFoundException {
+		return reelService.getReelById(reelId);
 	}
 	
 	@PutMapping("reels/{reel_id}")
 	public ResponseEntity<?> updateReel(@RequestHeader (name="Authorization") String token,
 			@PathVariable(value="reel_id") long reelId,
-			@RequestBody Reel reelDetails) throws ResourceNotFoundException, NotAllowedException {
-		String userName=jwtTokenUtil.getUsernameFromToken(token.split(" ")[1]);
-		Reel r=reelRepository.findById(reelId).orElseThrow(() -> new ResourceNotFoundException("Reel not found for this id : "+reelId));
-		User u=(userRepository.findById(r.getUserId()))
-				.orElseThrow(() -> new ResourceNotFoundException("User not found for this user name : "+userName));;
-		if(!u.getUsername().equals(userName)) {
-			return new ResponseEntity<ErrorDetails>(new ErrorDetails(Errors.NOT_ALLOWED,"Only Owner of reel can delete it"),HttpStatus.UNAUTHORIZED);
-		}
-		if(reelDetails.getCountry()!=null)
-			r.setCountry(reelDetails.getCountry());
-		if(reelDetails.getCity()!=null)
-			r.setCity(reelDetails.getCity());
-		if(reelDetails.getDescription()!=null)
-			r.setDescription(reelDetails.getDescription());
-		reelRepository.save(r);
-		return ResponseEntity.ok().body(r);
+			@RequestBody Reel reelDetails) throws ResourceNotFoundException{
+		return reelService.updateReel(token, reelId, reelDetails);
 	}
 	
 	@DeleteMapping("reels/{reel_id}")
 	public ResponseEntity<?> deleteReel(@RequestHeader (name="Authorization") String token,
 			@PathVariable(value="reel_id") long reelId,
-			@RequestBody Reel reelDetails) throws ResourceNotFoundException, NotAllowedException {
-		String userName=jwtTokenUtil.getUsernameFromToken(token.split(" ")[1]);
-		Reel r=reelRepository.findById(reelId).orElseThrow(() -> new ResourceNotFoundException("Reel not found for this id : "+reelId));
-		User u=(userRepository.findById(r.getUserId()))
-				.orElseThrow(() -> new ResourceNotFoundException("User not found for this user name : "+userName));;
-		if(!u.getUsername().equals(userName)) {
-			return new ResponseEntity<ErrorDetails>(new ErrorDetails(Errors.NOT_ALLOWED,"Only Owner of reel can delete it"),HttpStatus.UNAUTHORIZED);
-		}
-		reelRepository.deleteById(reelId);
-		return ResponseEntity.ok().build();
+			@RequestBody Reel reelDetails) throws ResourceNotFoundException {
+		return reelService.deleteReel(token, reelId, reelDetails);
 	}
 }
