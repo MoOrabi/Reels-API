@@ -1,22 +1,15 @@
 package com.moorabi.reelsapi.model;
 
-import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
@@ -40,9 +33,11 @@ public class User {
 	@Column(name = "user_name", unique = true)
 	private String username;
 	
+	@Email
 	@NotBlank
 	@Column(name = "email_id")
 	private String emailId;
+	
 	
 	@NotBlank
 	@Size(max = 120)
@@ -54,13 +49,6 @@ public class User {
 	
 	@OneToMany (mappedBy = "user" ,cascade = CascadeType.ALL)
 	private List<Reel> reels;
-
-	
-	
-
-	public List<Reel> getReels() {
-		return reels;
-	}
 
 
 	public User() {
@@ -134,6 +122,9 @@ public class User {
 	}
 
 
+	public List<Reel> getReels() {
+		return reels;
+	}
 
 
 	public String getAuthorities() {

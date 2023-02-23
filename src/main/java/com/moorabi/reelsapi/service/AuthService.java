@@ -2,6 +2,7 @@ package com.moorabi.reelsapi.service;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -12,9 +13,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PostMapping;
+
+import com.moorabi.reelsapi.exception.ErrorDetails;
+import com.moorabi.reelsapi.exception.Errors;
 import com.moorabi.reelsapi.model.User;
 import com.moorabi.reelsapi.repository.UserRepository;
 import com.moorabi.reelsapi.util.JwtTokenUtil;
+import com.moorabi.reelsapi.validator.PasswordValidator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -78,6 +83,9 @@ public class AuthService {
                                       String userName, 
                                       String email,
                                       String password) {
+    	if(!PasswordValidator.isValid(password)) {
+			return new ResponseEntity<ErrorDetails>(new ErrorDetails(Errors.INVALID_INPUT, "Password must be valid"), HttpStatus.BAD_REQUEST);
+		}
         Map<String, Object> responseMap = new HashMap<>();
         User user = new User();
         user.setFirstName(firstName);

@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.moorabi.reelsapi.DTO.LikeDTO;
 import com.moorabi.reelsapi.exception.ResourceNotFoundException;
-import com.moorabi.reelsapi.model.Like;
 import com.moorabi.reelsapi.service.LikeService;
 
 @RestController
@@ -24,7 +24,7 @@ public class LikeController {
 	private LikeService likeService;
 	
 	@GetMapping("/reels/{reel_id}/likes")
-	public List<Like> getAllLikesForReel(@PathVariable(value="reel_id") long id){
+	public List<LikeDTO> getAllLikesForReel(@PathVariable(value="reel_id") long id){
 		return likeService.getAllLikesForReel(id);
 	}
 	

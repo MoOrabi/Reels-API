@@ -1,8 +1,10 @@
 package com.moorabi.reelsapi.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,8 +14,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.moorabi.reelsapi.DTO.ReelDTO;
 import com.moorabi.reelsapi.exception.ResourceNotFoundException;
 import com.moorabi.reelsapi.model.Reel;
 import com.moorabi.reelsapi.service.ReelService;
@@ -26,14 +31,23 @@ public class ReelController {
 	private ReelService reelService;
 	
 	@GetMapping("/reels")
-	public List<Reel> getAllReels(){
+	public List<ReelDTO> getAllReels(){
 		return reelService.getAllReels();	
 	}
 	
 	@PostMapping("/reels")
-	public Reel createReel(@RequestHeader (name="Authorization") String token,
-			@RequestBody Reel reel) {
-		return reelService.createReel(token, reel);
+	public ReelDTO createReel(@RequestHeader (name="Authorization") String token,
+			@RequestParam("description") String description,
+			@RequestParam("country") String country,
+			@RequestParam("city") String city,
+			@RequestBody MultipartFile file) throws IOException {
+		return reelService.createReel(token, new Reel(country,city,description) ,file);
+	}
+	
+	@PostMapping("share/{reel_id}")
+	public ReelDTO shareReel(@RequestHeader (name="Authorization") String token,
+			@PathVariable(value = "reel_id") long id) throws IOException {
+		return reelService.shareReel(token, id);
 	}
 	
 	@GetMapping("reels/users/{user_id}")
@@ -42,13 +56,18 @@ public class ReelController {
 	}
 	
 	@GetMapping("reels/{country}/{city}")
-	public ResponseEntity<List<Reel>> getReelsByCity(@PathVariable(value="country") String country,@PathVariable(value="city") String city) throws ResourceNotFoundException{
+	public ResponseEntity<List<ReelDTO>> getReelsByCity(@PathVariable(value="country") String country,@PathVariable(value="city") String city) throws ResourceNotFoundException{
 		return reelService.getReelsByCity(country, city);
 	}
 	
-	@GetMapping("users/{user_id}/reels/{reel_id}")
-	public ResponseEntity<Reel> getReelById(@PathVariable(value="reel_id") long reelId) throws ResourceNotFoundException {
+	@GetMapping("reels/{reel_id}")
+	public ResponseEntity<ReelDTO> getReelById(@PathVariable(value="reel_id") long reelId) throws ResourceNotFoundException {
 		return reelService.getReelById(reelId);
+	}
+	
+	@GetMapping("reelsv/{reel_id}")
+	public ResponseEntity<Resource> getVideoReelById(@PathVariable(value="reel_id") long reelId) throws ResourceNotFoundException {
+		return reelService.getVideoReelById(reelId);
 	}
 	
 	@PutMapping("reels/{reel_id}")

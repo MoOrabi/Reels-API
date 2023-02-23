@@ -21,4 +21,7 @@ public interface ReelRepository extends JpaRepository<Reel,Long> {
 	
 	@Query("select r from Reel r where r.country=?1 and r.city=?2")		
 	List<Reel> findReelsByCity(String country, String city);
+
+	@Query("select r from Reel r where r.country=?1")
+	List<Reel> findReelsByCountry(String country);
 }

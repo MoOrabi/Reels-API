@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.moorabi.reelsapi.DTO.CommentDTO;
 import com.moorabi.reelsapi.exception.ResourceNotFoundException;
 import com.moorabi.reelsapi.model.Comment;
 import com.moorabi.reelsapi.service.CommentService;
@@ -26,12 +27,12 @@ public class CommentController {
 	private CommentService commentService;
 	
 	@GetMapping("/reels/{reel_id}/comments")
-	public List<Comment> getAllCommentsForReel(@PathVariable(value="reel_id") long id){
+	public List<CommentDTO> getAllCommentsForReel(@PathVariable(value="reel_id") long id){
 		return commentService.getAllCommentsForReel(id);	
 	}
 	
 	@PostMapping("/reels/{reel_id}/comment")
-	public Comment createComment(@RequestHeader (name="Authorization") String token,
+	public CommentDTO createComment(@RequestHeader (name="Authorization") String token,
 			@PathVariable(value="reel_id") long reel_id,@RequestBody Comment comment) {
 		return commentService.createComment(token, reel_id, comment);
 	}

@@ -8,7 +8,8 @@ public enum Errors {
 //    REEL_IS_MISSING("1000", "Failed to retrive reel");
 	NOT_ALLOWED("1001","Not Allowed"),
 	NOT_FOUND("0000","Not Found"), 
-	BAD_REQUEST("0001","Bad Request");
+	BAD_REQUEST("0001","Bad Request"),
+	INVALID_INPUT("0010","Invalid input");
 
     private final String code;
     private final String message;

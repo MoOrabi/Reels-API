@@ -1,6 +1,6 @@
 package com.moorabi.reelsapi.model;
 
-import java.io.File;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -10,11 +10,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotEmpty;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name= "reels")
@@ -23,7 +26,6 @@ public class Reel {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	
-//	@JsonManagedReference
 	@ManyToOne(cascade = {CascadeType.DETACH,
 			  CascadeType.PERSIST,
 			  CascadeType.MERGE,
@@ -31,26 +33,71 @@ public class Reel {
 	@JoinColumn(name="user_id", nullable=false)
 	private User user;
 	
+	@NotEmpty
 	@Column(name = "country")
 	private String country;
 	
+	@NotEmpty
 	@Column(name = "city")
 	private String city;
 	
 	@Column(name="description")
 	private String description;
 	
+	@NotEmpty
 	@Column(name = "video")
-	private File videoFile;
+	@Lob
+	private byte[] videoFile;
 
-//	@JsonManagedReference
 	@OneToMany(mappedBy = "reel", cascade = CascadeType.ALL)
 	private List<Comment> comments;
 	
-//	@JsonManagedReference
 	@OneToMany(mappedBy = "reel", cascade = CascadeType.ALL)
 	private List<Like> likes;
 	
+	@OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "origin_reel_id")
+	private Reel origin;
+	
+	@Column(name = "created_at")
+	private LocalDateTime createdAt;
+	
+	public Reel() {
+
+	}
+	
+	
+	
+	public Reel(long id, User user, @NotEmpty String country, @NotEmpty String city, String description,
+			@NotEmpty byte[] videoFile, List<Comment> comments, List<Like> likes) {
+		this.id = id;
+		this.user = user;
+		this.country = country;
+		this.city = city;
+		this.description = description;
+		this.videoFile = videoFile;
+		this.comments = comments;
+		this.likes = likes;
+		this.createdAt=LocalDateTime.now();
+	}
+
+	public Reel(User user, @NotEmpty String country, @NotEmpty String city, String description,
+			@NotEmpty byte[] videoFile) {
+		this.user = user;
+		this.country = country;
+		this.city = city;
+		this.description = description;
+		this.videoFile = videoFile;
+		this.createdAt=LocalDateTime.now();
+	}
+
+	public Reel(@NotEmpty String country, @NotEmpty String city, String description) {
+		this.country = country;
+		this.city = city;
+		this.description = description;
+		this.createdAt=LocalDateTime.now();
+	}
+
 	public List<Like> getLikes() {
 		return likes;
 	}
@@ -75,10 +122,12 @@ public class Reel {
 		this.id = id;
 	}
 
-	public String getUser() {
-		return user.getUsername()+" "+user.getFirstName()+" "+user.getLastName();
+	@JsonIgnore
+	public User getUser() {
+		return user;
 	}
 	
+	@JsonIgnore
 	public long getUserId() {
 		return user.getId();
 	}
@@ -112,11 +161,37 @@ public class Reel {
 		this.description = description;
 	}
 
-	public File getVideoFile() {
+	public byte[] getVideoFile() {
 		return videoFile;
 	}
 
-	public void setVideoFile(File videoFile) {
+	public void setVideoFile(byte[] videoFile) {
 		this.videoFile = videoFile;
+	}
+
+
+	@JsonIgnore
+	public Reel getOrigin() {
+		return origin;
+	}
+
+	public long getOriginId() {
+		return origin.getId();
+	}
+
+	public void setOrigin(Reel origin) {
+		this.origin = origin;
+	}
+
+
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
 	}
 }

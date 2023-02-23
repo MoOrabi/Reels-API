@@ -11,6 +11,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name="likes")
 public class Like {
@@ -44,21 +46,27 @@ public class Like {
 	}
 
 
-	public long getReel() {
-		return reel.getId();
+	@JsonIgnore
+	public Reel getReel() {
+		return reel;
 	}
 
+	public Long getReelId() {
+		return reel.getId();
+	}
+	
 	public void setReel(Reel reel) {
 		this.reel = reel;
 	}
 
-	public long getUser() {
-		return user.getId();
+	@JsonIgnore
+	public User getUser() {
+		return user;
 	}
 
-//	public User getUserA() {
-//		return user;
-//	}
+	public String getUserName() {
+		return user.getUsername();
+	}
 	
 	public void setUser(User user) {
 		this.user = user;
