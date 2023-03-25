@@ -20,7 +20,7 @@ public class UserUtil {
     }
 	
 	public static UserDTO convertToDTO(User user) {
-		return new UserDTO((Long)user.getId(),user.getEmailId(),user.getPassword());
+		return new UserDTO((Long)user.getId(),user.getEmail(),user.getPassword());
 	}
 
 	public static List<UserDTO> convertAllToDTO(List<User> users){

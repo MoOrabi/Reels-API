@@ -27,6 +27,9 @@ public class JwtUserDetailsService implements UserDetailsService {
         com.moorabi.reelsapi.model.User user = userRepository.findUserByUsername(username);
         List<GrantedAuthority> authorityList = new ArrayList<>();
         authorityList.add(new SimpleGrantedAuthority("USER_ROLE"));
+        if(user ==null) {
+        	throw new UsernameNotFoundException("User not found");
+        }
         return new User(user.getUsername(), user.getPassword(), authorityList);
     }
 

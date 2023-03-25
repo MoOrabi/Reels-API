@@ -1,13 +1,16 @@
 package com.moorabi.reelsapi.controller;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.moorabi.reelsapi.model.FacebookAuthModel;
 import com.moorabi.reelsapi.service.AuthService;
 
 @RestController
@@ -27,6 +30,12 @@ public class AuthController {
     public ResponseEntity<?> loginUser(@RequestParam("user_name") String username,
                                        @RequestParam("password") String password) {
         return authService.loginUser(username, password);
+    }
+    
+    @PostMapping("login/facebook")
+    public ResponseEntity<?> facebook(@RequestBody @Valid FacebookAuthModel facebookAuthModel) {
+    	
+        return authService.facebook(facebookAuthModel);
     }
 
     @PostMapping("/register")

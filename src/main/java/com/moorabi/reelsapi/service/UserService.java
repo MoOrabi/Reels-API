@@ -8,8 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-
 import com.moorabi.reelsapi.DTO.UserDTO;
 import com.moorabi.reelsapi.exception.ErrorDetails;
 import com.moorabi.reelsapi.exception.Errors;
@@ -29,7 +27,6 @@ public class UserService {
 	private JwtTokenUtil jwtTokenUtil;
 
 	
-	@GetMapping("/users")
 	public List<UserDTO> getAllUsers(){
 		return UserUtil.convertAllToDTO(userRepository.findAll());
 	}
@@ -62,7 +59,7 @@ public class UserService {
 		u.setFirstName(user.getFirstName());
 		u.setLastName(user.getLastName());
 		u.setUsername(user.getUsername());
-		u.setEmailId(user.getEmailId());
+		u.setEmail(user.getEmail());
 		if(!PasswordValidator.isValid(user.getPassword())) {
 			return new ResponseEntity<ErrorDetails>(new ErrorDetails(Errors.INVALID_INPUT, "Password must be valid"), 
 					HttpStatus.BAD_REQUEST);
