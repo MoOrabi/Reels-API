@@ -12,29 +12,18 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
 import com.moorabi.reelsapi.exception.ErrorDetails;
 import com.moorabi.reelsapi.exception.Errors;
-import com.moorabi.reelsapi.model.FacebookAuthModel;
-import com.moorabi.reelsapi.model.FacebookUserModel;
-import com.moorabi.reelsapi.model.LoginMethodEnum;
-import com.moorabi.reelsapi.model.LoginResponse;
+import com.moorabi.reelsapi.model.Token;
+import com.moorabi.reelsapi.model.TokenType;
 import com.moorabi.reelsapi.model.User;
-import com.moorabi.reelsapi.model.UserPrincipal;
+import com.moorabi.reelsapi.repository.TokenRepository;
 import com.moorabi.reelsapi.repository.UserRepository;
 import com.moorabi.reelsapi.util.JwtTokenUtil;
 import com.moorabi.reelsapi.validator.PasswordValidator;
 
-import net.bytebuddy.utility.RandomString;
-
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
-
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
@@ -45,15 +34,20 @@ public class AuthService {
     public static final String FACEBOOK_AUTH_URL = "https://graph.facebook.com/me?fields=email,first_name,last_name&access_token=%s";
 
     final UserRepository userRepository;
+    final TokenRepository tokenRepository;
     final AuthenticationManager authenticationManager;
     final JwtUserDetailsService userDetailsService;
     final JwtTokenUtil jwtTokenUtil;
     
 //    final WebClient webClient;
 
-    public AuthService(UserRepository userRepository, AuthenticationManager authenticationManager,
-                                    JwtUserDetailsService userDetailsService, JwtTokenUtil jwtTokenUtil) {
+    public AuthService(UserRepository userRepository,
+    		TokenRepository tokenRepository,
+    		AuthenticationManager authenticationManager,
+            JwtUserDetailsService userDetailsService,
+            JwtTokenUtil jwtTokenUtil) {
         this.userRepository = userRepository;
+        this.tokenRepository = tokenRepository;
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.jwtTokenUtil = jwtTokenUtil;
@@ -67,11 +61,13 @@ public class AuthService {
                     , password));
             if (auth.isAuthenticated()) {
                 logger.info("Logged In");
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                String token = jwtTokenUtil.generateToken(userDetails);
+                User user = userRepository.findUserByUsername(username);
+                String jwtToken = jwtTokenUtil.generateToken(user);
+                revokeAllUserTokens(user);
+                saveUserToken(user, jwtToken);
                 responseMap.put("error", false);
                 responseMap.put("message", "Logged In");
-                responseMap.put("token", token);
+                responseMap.put("token", jwtToken);
                 return ResponseEntity.ok(responseMap);
             } else {
                 responseMap.put("error", true);
@@ -112,52 +108,40 @@ public class AuthService {
         user.setAuthorities("USER");
         user.setUsername(userName);
         UserDetails userDetails = userDetailsService.createUserDetails(userName, user.getPassword());
-        String token = jwtTokenUtil.generateToken(userDetails);
+        String jwtToken = jwtTokenUtil.generateToken(userDetails);
         userRepository.save(user);
+        saveUserToken(user, jwtToken);
         responseMap.put("error", false);
         responseMap.put("username", userName);
         responseMap.put("message", "Account created successfully");
-        responseMap.put("token", token);
+        responseMap.put("token", jwtToken);
         return ResponseEntity.ok(responseMap);
     }
-    
-    public ResponseEntity<?> facebook(FacebookAuthModel facebookAuthModel) {
-        String templateUrl = String.format(FACEBOOK_AUTH_URL, facebookAuthModel.getAuthToken());
-        FacebookUserModel facebookUserModel = WebClient.create().get().uri(templateUrl).retrieve()
-                .onStatus(HttpStatus::isError, clientResponse -> {
-                    throw new ResponseStatusException(clientResponse.statusCode(), "facebook login error");
-                })
-                .bodyToMono(FacebookUserModel.class)
-                .block();
 
-        final Optional<User> userOptional = userRepository.findByEmail(facebookUserModel.getEmail());
-
-        if (userOptional.isEmpty()) {        //we have no user with given email so register them
-            final User user = new User(generateUserName(facebookUserModel.getFirstName(),facebookUserModel.getLastName()),facebookUserModel.getEmail(), new RandomString(10).nextString(), LoginMethodEnum.FACEBOOK);
-            userRepository.save(user);
-            final UserPrincipal userPrincipal = new UserPrincipal(user);
-            String jwt = jwtTokenUtil.generateToken(userPrincipal);
-            URI location = ServletUriComponentsBuilder
-                    .fromCurrentContextPath().path("/api/v1/users/{username}")
-                    .buildAndExpand(facebookUserModel.getFirstName()).toUri();
-
-            return ResponseEntity.created(location).body(new LoginResponse(jwt));
-        } else { // user exists just login
-            final User user = userOptional.get();
-            if ((user.getLoginMethodEnum() != LoginMethodEnum.FACEBOOK)) { //check if logged in with different logged in method
-                return ResponseEntity.badRequest().body("previously logged in with different login method");
-            }
-
-            UserPrincipal userPrincipal = new UserPrincipal(user);
-            String jwt = jwtTokenUtil.generateToken(userPrincipal);
-            Map<String, Object> responseMap = new HashMap<>();
-            responseMap.put("error", false);
-            responseMap.put("username", user.getUsername());
-            responseMap.put("message", "Logged in successfully");
-            responseMap.put("token", jwt);
-            return ResponseEntity.ok(responseMap);
-        }
+    private void revokeAllUserTokens(User user) {
+    	var validUserTokens = tokenRepository.findAllValidTokens(user.getId());
+    	if (validUserTokens.isEmpty()) {
+    		return;
+    	}
+    	validUserTokens.forEach(t -> {
+    		t.setExpired(true);
+    		t.setRevoked(true);
+    	});
+    	tokenRepository.saveAll(validUserTokens);
     }
+    
+	private void saveUserToken(User user, String jwtToken) {
+		Token token = Token.builder()
+        		.user(user)
+        		.token(jwtToken)
+        		.tokenType(TokenType.BEARER)
+        		.revoked(false)
+        		.expired(false)
+        		.build();
+        tokenRepository.save(token);
+	}
+    
+    
 
 	private @NotBlank @Size(max = 50) String generateUserName(String firstName, String lastName) {
 		// TODO Auto-generated method stub

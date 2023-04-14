@@ -11,6 +11,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.moorabi.reelsapi.repository.TokenRepository;
 import com.moorabi.reelsapi.service.JwtUserDetailsService;
 
 import javax.servlet.FilterChain;
@@ -25,7 +26,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     private final JwtUserDetailsService jwtUserDetailsService;
     private final JwtTokenUtil jwtTokenUtil;
-
+    private final TokenRepository tokenRepository;
     
 
     @Override
@@ -51,7 +52,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             if (StringUtils.isNotEmpty(username)
                     && null == SecurityContextHolder.getContext().getAuthentication()) {
                 UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(username);
-                if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
+                var isTokenValid = tokenRepository.findByToken(jwtToken)
+                		.map(t -> !t.isExpired() && !t.isRevoked())
+                		.orElse(false);
+                if (jwtTokenUtil.validateToken(jwtToken, userDetails)
+                		&& isTokenValid) {
                     UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                             new UsernamePasswordAuthenticationToken(
                                     userDetails, null, userDetails.getAuthorities());

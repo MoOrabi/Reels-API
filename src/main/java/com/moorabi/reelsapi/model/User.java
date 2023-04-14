@@ -24,6 +24,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Table(name="users")
 public class User implements UserDetails {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
@@ -60,6 +66,8 @@ public class User implements UserDetails {
 	@OneToMany (mappedBy = "user" ,cascade = CascadeType.ALL)
 	private List<Reel> reels;
 
+	@OneToMany(mappedBy = "user")
+	private List<Token> tokens;
 
 	public User() {
 		
@@ -160,13 +168,23 @@ public class User implements UserDetails {
 		this.loginMethodEnum = loginMethodEnum;
 	}
 	
-	  @Override
-	  public Collection<? extends GrantedAuthority> getAuthorities() {
-	    return List.of(new SimpleGrantedAuthority(authorities));
-	  }
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+	  return List.of(new SimpleGrantedAuthority(authorities));
+	}
 
 
-	  @Override
+	public List<Token> getTokens() {
+		return tokens;
+	}
+
+
+	public void setTokens(List<Token> tokens) {
+		this.tokens = tokens;
+	}
+
+
+	@Override
 	  public boolean isAccountNonExpired() {
 	    return true;
 	  }
