@@ -28,7 +28,7 @@ public class UserUtil {
 		for (User user : users) {
 			usersDTO.add(convertToDTO(user));
 		}
-		return null;
+		return usersDTO;
 	}
 
 }

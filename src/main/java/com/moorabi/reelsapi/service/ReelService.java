@@ -49,20 +49,19 @@ public class ReelService {
 		return ReelUtil.convertToDTO(reel);
 	}
 	
-	public ResponseEntity<List<Reel>> getReelsByUserId(long id) throws ResourceNotFoundException{
-		User u=userRepository.findById(id).get();
-		List<Reel> r=reelRepository.findByUser(u);
-		return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM).body(r);
+	public ResponseEntity<List<ReelDTO>> getReelsByUserId(long id) throws ResourceNotFoundException{
+		List<Reel> r=reelRepository.findByUserId(id);
+		return ResponseEntity.ok().body(ReelUtil.convertAllToDTO(r));
 	}
 	
 	public ResponseEntity<List<ReelDTO>> getReelsByCountry(String country) throws ResourceNotFoundException{
 		List<Reel> r=reelRepository.findReelsByCountry(country);
-		return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM).body(ReelUtil.convertAllToDTO(r));
+		return ResponseEntity.ok().body(ReelUtil.convertAllToDTO(r));
 	}
 	
 	public ResponseEntity<List<ReelDTO>> getReelsByCity(String country,String city) throws ResourceNotFoundException{
 		List<Reel> r=reelRepository.findReelsByCity(country,city);
-		return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM).body(ReelUtil.convertAllToDTO(r));
+		return ResponseEntity.ok().body(ReelUtil.convertAllToDTO(r));
 	}
 	
 	public ResponseEntity<ReelDTO> getReelById(long reelId) throws ResourceNotFoundException{

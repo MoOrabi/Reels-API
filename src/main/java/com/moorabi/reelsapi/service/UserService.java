@@ -40,7 +40,11 @@ public class UserService {
 //	}
 	
 	public ResponseEntity<UserDTO> getUserById(long id) throws ResourceNotFoundException{
-		User u=userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found for this id : "+id));
+		System.out.println("HiS");
+		User u=userRepository.findById(id)
+				.orElseThrow(() -> 
+				new ResourceNotFoundException
+				("User not found for this id : "+id));
 		return ResponseEntity.ok().body(UserUtil.convertToDTO(u));
 	}
 	

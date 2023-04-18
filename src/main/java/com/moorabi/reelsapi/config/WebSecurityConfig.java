@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -32,7 +33,6 @@ public class WebSecurityConfig {
 		.csrf()
 		.disable()
 		.authorizeHttpRequests()
-		
         .antMatchers("/auth/**","/f/**","/home","/room/**")
         .permitAll()
         .anyRequest()
@@ -40,7 +40,7 @@ public class WebSecurityConfig {
         .and()
         .sessionManagement()
         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-		.and()
+        .and()
 		.authenticationProvider(authenticationProvider)
 		.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
 		.logout()
@@ -50,9 +50,26 @@ public class WebSecurityConfig {
 				(request, response, authentication) -> 
 				SecurityContextHolder.clearContext());
 		;
+		
 		return http.build();
 	}
     
+//	@Bean
+//	@Order(1)
+//	public SecurityFilterChain oAuthSecurityFilterChain(HttpSecurity http) throws Exception {
+//		
+//		
+//		http
+//        .csrf()
+//        .disable()
+//        .authorizeHttpRequests()
+//        .anyRequest()
+//        .authenticated()
+//        .and()
+//        .oauth2Login()
+//    ;
+//		return http.build();
+//	}
 
    
 }

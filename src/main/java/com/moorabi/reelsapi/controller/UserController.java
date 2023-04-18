@@ -2,7 +2,7 @@ package com.moorabi.reelsapi.controller;
 
 import java.util.List;
 
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +22,7 @@ import com.moorabi.reelsapi.service.UserService;
 @RequestMapping("/api/v1")
 public class UserController {
 	
+	@Autowired
 	private UserService userService;
 	
 	@GetMapping("/users")
@@ -37,10 +38,14 @@ public class UserController {
 	
 	@GetMapping("users/{id}")
 	public ResponseEntity<UserDTO> getUserById(@PathVariable(value="id") long id) throws ResourceNotFoundException{
+		System.out.println("Hi");
 		return userService.getUserById(id);
 	}
-	
-	@GetMapping("users/{userName}")
+//	public ResponseEntity<User> getUserById(@PathVariable(value="id") long id) throws ResourceNotFoundException{
+//		System.out.println("Hi");
+//		return userService.getUserById(id);
+//	}
+	@GetMapping("users/un/{userName}")
 	public ResponseEntity<UserDTO> getUserByUserName(@PathVariable(value="userName") String userName) throws ResourceNotFoundException{
 		return userService.getUserByUserName(userName);
 	}

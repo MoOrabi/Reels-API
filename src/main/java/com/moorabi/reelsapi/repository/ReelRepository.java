@@ -13,8 +13,8 @@ import com.moorabi.reelsapi.model.User;
 public interface ReelRepository extends JpaRepository<Reel,Long> {
 	
 	
-	@Query("select r from Reel r where r.user=?1")	
-	List<Reel> findByUser(User user);
+	@Query("select r from Reel r, User u where r.user.id=u.id and r.user.id=?1")	
+	List<Reel> findByUserId(long id);
 	
 	@Query("select r from Reel r where r.user=?1 and r.id=?2")		
 	Reel findReelByUser(User user, long id);

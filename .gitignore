@@ -1,3 +1,4 @@
+
 HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
@@ -35,3 +36,9 @@ build/
 bin/
 
 mysql.sock
+
+.data
+
+*.pem
+*.p12
+*.crt

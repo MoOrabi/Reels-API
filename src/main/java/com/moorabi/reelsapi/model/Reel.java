@@ -55,7 +55,7 @@ public class Reel {
 	@OneToMany(mappedBy = "reel", cascade = CascadeType.ALL)
 	private List<Like> likes;
 	
-	@OneToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "origin_reel_id")
 	private Reel origin;
 	
@@ -176,6 +176,9 @@ public class Reel {
 	}
 
 	public long getOriginId() {
+		if(getOrigin()==null) {
+			return 0;
+		}
 		return origin.getId();
 	}
 
