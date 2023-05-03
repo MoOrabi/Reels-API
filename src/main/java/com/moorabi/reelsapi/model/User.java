@@ -2,6 +2,8 @@ package com.moorabi.reelsapi.model;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,6 +13,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -20,6 +23,11 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name="users")
 public class User implements UserDetails {
@@ -32,7 +40,7 @@ public class User implements UserDetails {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+	private String id;
 	
 	
 	@Column(name = "first_name")
@@ -69,10 +77,26 @@ public class User implements UserDetails {
 	@OneToMany(mappedBy = "user")
 	private List<Token> tokens;
 
+	private boolean active;
+	@OneToOne
+    private Profile userProfile;
+    
+    @OneToMany(mappedBy = "name")
+    private Set<Role> roles;
+	
 	public User() {
 		
 	}
 	
+	public User(User user) {
+        this.id = user.id;
+        this.username = user.username;
+        this.password = user.password;
+        this.email = user.email;
+        this.active = user.active;
+        this.userProfile = user.userProfile;
+        this.roles = user.roles;        
+    }
 
 	public User(@NotBlank @Size(max = 20) String username, @NotBlank String emailId,
 			@NotBlank @Size(max = 120) String password) {
@@ -120,11 +144,11 @@ public class User implements UserDetails {
 	}
 	
 	
-	public long getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -203,5 +227,35 @@ public class User implements UserDetails {
 	  public boolean isEnabled() {
 	    return true;
 	  }
+
+
+	public boolean isActive() {
+		return active;
+	}
+
+
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
+
+	public Profile getUserProfile() {
+		return userProfile;
+	}
+
+
+	public void setUserProfile(Profile userProfile) {
+		this.userProfile = userProfile;
+	}
+
+
+	public Set<Role> getRoles() {
+		return roles;
+	}
+
+
+	public void setRoles(Set<Role> roles) {
+		this.roles = roles;
+	}
 	
 }

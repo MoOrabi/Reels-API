@@ -27,7 +27,7 @@ public class LikeDTO {
 		return user;
 	}
 
-	public long getUserId() {
+	public String getUserId() {
 		return user.getId();
 	}
 
