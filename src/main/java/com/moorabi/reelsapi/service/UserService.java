@@ -1,7 +1,7 @@
 package com.moorabi.reelsapi.service;
 
 import java.util.List;
-
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,6 +12,8 @@ import com.moorabi.reelsapi.DTO.UserDTO;
 import com.moorabi.reelsapi.exception.ErrorDetails;
 import com.moorabi.reelsapi.exception.Errors;
 import com.moorabi.reelsapi.exception.ResourceNotFoundException;
+import com.moorabi.reelsapi.model.LoginMethodEnum;
+import com.moorabi.reelsapi.model.Role;
 import com.moorabi.reelsapi.model.User;
 import com.moorabi.reelsapi.repository.UserRepository;
 import com.moorabi.reelsapi.util.JwtTokenUtil;
@@ -31,16 +33,20 @@ public class UserService {
 		return UserUtil.convertAllToDTO(userRepository.findAll());
 	}
 	
-//	public ResponseEntity<?> createUser(User user) {
+	public User createUser(User user,  Role role) {
 //		if(!PasswordValidator.isValid(user.getPassword())) {
-//			return new ResponseEntity<ErrorDetails>(new ErrorDetails(Errors.INVALID_INPUT, "Password must be valid"), HttpStatus.BAD_REQUEST);
+//			throw new ErrorDetails(Errors.INVALID_INPUT, "Password must be valid");
 //		}
-//		userRepository.save(user);
-//		return ResponseEntity.ok().body(user);
-//	}
+		user.getRoles().add(role);
+		userRepository.save(user);
+		return user;
+	}
 	
-	public ResponseEntity<UserDTO> getUserById(long id) throws ResourceNotFoundException{
-		System.out.println("HiS");
+	public Optional<User> findById(String id) {
+        return userRepository.findById(id);
+    }
+	
+	public ResponseEntity<UserDTO> getUserById(String id) throws ResourceNotFoundException{
 		User u=userRepository.findById(id)
 				.orElseThrow(() -> 
 				new ResourceNotFoundException
@@ -79,4 +85,18 @@ public class UserService {
 		userRepository.deleteById(u.getId());
 		return ResponseEntity.ok().build();
 	}
+	
+	public void processOAuthPostLogin(String username,String Email) {
+        User existUser = userRepository.findUserByUsername(username);
+         
+        if (existUser == null) {
+            User newUser = new User();
+            newUser.setUsername(username);
+            newUser.setLoginMethodEnum(LoginMethodEnum.FACEBOOK);
+            newUser.setPassword("changeme"); 
+            newUser.setEmail(Email);
+            userRepository.save(newUser);        
+        }
+         
+    }  
 }

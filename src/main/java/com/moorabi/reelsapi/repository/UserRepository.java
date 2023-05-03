@@ -11,10 +11,12 @@ import com.moorabi.reelsapi.model.User;
 
 
 @Repository
-public interface UserRepository extends JpaRepository<User,Long> {
+public interface UserRepository extends JpaRepository<User,String> {
 	
 	@Query("SELECT u FROM User u WHERE u.username = ?1")
 	User findUserByUsername(String username);
 	
 	Optional<User> findByEmail(String email);
+	
+	Optional<User> findById(String id);
 }

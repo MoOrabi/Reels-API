@@ -5,6 +5,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +17,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenUtil implements Serializable {
@@ -60,6 +64,19 @@ public class JwtTokenUtil implements Serializable {
         return expiration.before(new Date());
     }
 
+	public String generateToken(Authentication authentication) {
+
+        Long now = System.currentTimeMillis();
+        return Jwts.builder()
+                .setSubject(authentication.getName())
+                .claim("authorities", authentication.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
+                .setIssuedAt(new Date(now))
+                .setExpiration(new Date(now + JWT_TOKEN_VALIDITY * 1000))  // in milliseconds
+                .signWith(SignatureAlgorithm.HS512, SECRET_KEY.getBytes())
+                .compact();
+    }
+	
 	public String generateToken(UserDetails userDetails) {
 		
 		return generateToken(new HashMap<>(), userDetails);

@@ -37,8 +37,7 @@ public class UserController {
 //	}
 	
 	@GetMapping("users/{id}")
-	public ResponseEntity<UserDTO> getUserById(@PathVariable(value="id") long id) throws ResourceNotFoundException{
-		System.out.println("Hi");
+	public ResponseEntity<UserDTO> getUserById(@PathVariable(value="id") String id) throws ResourceNotFoundException{
 		return userService.getUserById(id);
 	}
 //	public ResponseEntity<User> getUserById(@PathVariable(value="id") long id) throws ResourceNotFoundException{

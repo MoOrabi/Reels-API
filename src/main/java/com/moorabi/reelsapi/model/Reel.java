@@ -128,7 +128,7 @@ public class Reel {
 	}
 	
 	@JsonIgnore
-	public long getUserId() {
+	public String getUserId() {
 		return user.getId();
 	}
 

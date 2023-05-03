@@ -32,7 +32,7 @@ public class LikeController {
 	public ResponseEntity<?> postLike(@RequestHeader (name="Authorization") String token,
 			@PathVariable(value="reel_id") long reel_id) throws ResourceNotFoundException {
 		
-		return likeService.deleteLike(token, reel_id);
+		return likeService.postLike(token, reel_id);
 	}
 
 

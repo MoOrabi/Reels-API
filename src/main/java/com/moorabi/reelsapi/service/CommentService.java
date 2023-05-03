@@ -56,7 +56,7 @@ public class CommentService {
 			throws ResourceNotFoundException{
 		String userName=jwtTokenUtil.getUsernameFromToken(token.split(" ")[1]);
 		Comment c= commentRepository.findById(comment_id).orElseThrow(() -> new ResourceNotFoundException("Comment not found for this id : "+comment_id));
-		User u=(userRepository.findById((Long)c.getUser().getId()))
+		User u=(userRepository.findById((String)c.getUser().getId()))
 				.orElseThrow(() -> new ResourceNotFoundException("User not found for this user name : "+userName));;
 		if(!u.getUsername().equals(userName)) {
 			return new ResponseEntity<ErrorDetails>(new ErrorDetails(Errors.NOT_ALLOWED,"Only Owner of comment can update it"),HttpStatus.UNAUTHORIZED);
