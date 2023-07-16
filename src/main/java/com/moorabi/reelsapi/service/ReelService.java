@@ -17,7 +17,7 @@ import com.moorabi.reelsapi.exception.ErrorDetails;
 import com.moorabi.reelsapi.exception.Errors;
 import com.moorabi.reelsapi.exception.ResourceNotFoundException;
 import com.moorabi.reelsapi.model.Reel;
-import com.moorabi.reelsapi.model.User;
+import com.moorabi.reelsapi.model.AppUser;
 import com.moorabi.reelsapi.repository.ReelRepository;
 import com.moorabi.reelsapi.repository.UserRepository;
 import com.moorabi.reelsapi.util.JwtTokenUtil;
@@ -36,12 +36,14 @@ public class ReelService {
 	private JwtTokenUtil jwtTokenUtil;
 	
 	public List<ReelDTO> getAllReels(){
-		return ReelUtil.convertAllToDTO(reelRepository.findAll());
+		List<Reel> allReels = reelRepository.findAll();
+		List<ReelDTO> allReelsDTOs = ReelUtil.convertAllToDTO(allReels);
+		return allReelsDTOs;
 	}
 	
 	public ReelDTO createReel(String token,Reel reel, MultipartFile file) throws IOException {
 		String userName=jwtTokenUtil.getUsernameFromToken(token.split(" ")[1]);
-		User u=userRepository.findUserByUsername(userName);
+		AppUser u=userRepository.findUserByUsername(userName);
 		u.getReels().add(reel);
 		reel.setUser(u);
 		reel.setVideoFile(file.getBytes());
@@ -49,18 +51,18 @@ public class ReelService {
 		return ReelUtil.convertToDTO(reel);
 	}
 	
-	public ResponseEntity<List<ReelDTO>> getReelsByUserId(long id) throws ResourceNotFoundException{
-		List<Reel> r=reelRepository.findByUserId(id);
+	public ResponseEntity<List<ReelDTO>> getReelsByUserId(String id) throws ResourceNotFoundException{
+		List<Reel> r=reelRepository.findReelsForUserByUserId(id);
 		return ResponseEntity.ok().body(ReelUtil.convertAllToDTO(r));
 	}
 	
 	public ResponseEntity<List<ReelDTO>> getReelsByCountry(String country) throws ResourceNotFoundException{
-		List<Reel> r=reelRepository.findReelsByCountry(country);
+		List<Reel> r=reelRepository.findByCountry(country);
 		return ResponseEntity.ok().body(ReelUtil.convertAllToDTO(r));
 	}
 	
 	public ResponseEntity<List<ReelDTO>> getReelsByCity(String country,String city) throws ResourceNotFoundException{
-		List<Reel> r=reelRepository.findReelsByCity(country,city);
+		List<Reel> r=reelRepository.findByCountryAndCity(country,city);
 		return ResponseEntity.ok().body(ReelUtil.convertAllToDTO(r));
 	}
 	
@@ -77,7 +79,7 @@ public class ReelService {
 	public ResponseEntity<?> updateReel(String token,long reelId,Reel reelDetails) throws ResourceNotFoundException {
 		String userName=jwtTokenUtil.getUsernameFromToken(token.split(" ")[1]);
 		Reel r=reelRepository.findById(reelId).orElseThrow(() -> new ResourceNotFoundException("Reel not found for this id : "+reelId));
-		User u=(userRepository.findById(r.getUserId()))
+		AppUser u=(userRepository.findById(r.getUserId()))
 				.orElseThrow(() -> new ResourceNotFoundException("User not found for this user name : "+userName));;
 		if(!u.getUsername().equals(userName)) {
 			return new ResponseEntity<ErrorDetails>(new ErrorDetails(Errors.NOT_ALLOWED,"Only Owner of reel can delete it"),HttpStatus.UNAUTHORIZED);
@@ -95,7 +97,7 @@ public class ReelService {
 	public ResponseEntity<?> deleteReel(String token,long reelId,Reel reelDetails) throws ResourceNotFoundException {
 		String userName=jwtTokenUtil.getUsernameFromToken(token.split(" ")[1]);
 		Reel r=reelRepository.findById(reelId).orElseThrow(() -> new ResourceNotFoundException("Reel not found for this id : "+reelId));
-		User u=(userRepository.findById(r.getUserId()))
+		AppUser u=(userRepository.findById(r.getUserId()))
 				.orElseThrow(() -> new ResourceNotFoundException("User not found for this user name : "+userName));;
 		if(!u.getUsername().equals(userName)) {
 			return new ResponseEntity<ErrorDetails>(new ErrorDetails(Errors.NOT_ALLOWED,"Only Owner of reel can delete it"),HttpStatus.UNAUTHORIZED);
@@ -107,7 +109,7 @@ public class ReelService {
 	public ReelDTO shareReel(String token, long id) {
 		String userName=jwtTokenUtil.getUsernameFromToken(token.split(" ")[1]);
 		Reel  reel=reelRepository.findById(id).get();
-		User u=userRepository.findUserByUsername(userName);
+		AppUser u=userRepository.findUserByUsername(userName);
 		Reel newReel= new Reel(u, reel.getCountry(), reel.getCity(), reel.getDescription(),reel.getVideoFile());
 		u.getReels().add(newReel);
 		newReel.setOrigin(reel);

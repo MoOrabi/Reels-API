@@ -19,6 +19,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,8 +30,8 @@ import lombok.Builder;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name="users")
-public class User implements UserDetails {
+@Table(name="APPUSERS")
+public class AppUser implements UserDetails {
 	
 	/**
 	 * 
@@ -39,7 +40,8 @@ public class User implements UserDetails {
 
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(generator="system-uuid")
+	@GenericGenerator(name="system-uuid", strategy = "uuid")
 	private String id;
 	
 	
@@ -71,10 +73,10 @@ public class User implements UserDetails {
 	@Enumerated(EnumType.STRING)
     private LoginMethodEnum loginMethodEnum;
 	
-	@OneToMany (mappedBy = "user" ,cascade = CascadeType.ALL)
+	@OneToMany (mappedBy = "appUser" ,cascade = CascadeType.ALL)
 	private List<Reel> reels;
 
-	@OneToMany(mappedBy = "user")
+	@OneToMany(mappedBy = "appUser")
 	private List<Token> tokens;
 
 	private boolean active;
@@ -84,21 +86,21 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "name")
     private Set<Role> roles;
 	
-	public User() {
+	public AppUser() {
 		
 	}
 	
-	public User(User user) {
-        this.id = user.id;
-        this.username = user.username;
-        this.password = user.password;
-        this.email = user.email;
-        this.active = user.active;
-        this.userProfile = user.userProfile;
-        this.roles = user.roles;        
+	public AppUser(AppUser appUser) {
+        this.id = appUser.id;
+        this.username = appUser.username;
+        this.password = appUser.password;
+        this.email = appUser.email;
+        this.active = appUser.active;
+        this.userProfile = appUser.userProfile;
+        this.roles = appUser.roles;        
     }
 
-	public User(@NotBlank @Size(max = 20) String username, @NotBlank String emailId,
+	public AppUser(@NotBlank @Size(max = 20) String username, @NotBlank String emailId,
 			@NotBlank @Size(max = 120) String password) {
 		this.username = username;
 		this.email = emailId;
@@ -106,7 +108,7 @@ public class User implements UserDetails {
 		this.loginMethodEnum=LoginMethodEnum.NATIVE;
 	}
 	
-	public User(@NotBlank @Size(max = 20) String username, @NotBlank String emailId,
+	public AppUser(@NotBlank @Size(max = 20) String username, @NotBlank String emailId,
 			@NotBlank @Size(max = 120) String password,LoginMethodEnum loginMethodEnum) {
 		this.username = username;
 		this.email = emailId;

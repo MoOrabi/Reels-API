@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.moorabi.reelsapi.model.Reel;
-import com.moorabi.reelsapi.model.User;
+import com.moorabi.reelsapi.model.AppUser;
 
 import lombok.NoArgsConstructor;
 
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class ReelDTO {
 
 	private Long Id;
-	private User user;
+	private AppUser appUser;
 	
 	
 	private String country;
@@ -35,10 +35,10 @@ public class ReelDTO {
 
 	private LocalDateTime createdAt;
 
-	public ReelDTO(Long id, User user, String country, String city, String description, byte[] videoFile,
+	public ReelDTO(Long id, AppUser appUser, String country, String city, String description, byte[] videoFile,
 			List<LikeDTO> likes, Reel origin, LocalDateTime createdAt) {
 		Id = id;
-		this.user = user;
+		this.appUser = appUser;
 		this.country = country;
 		this.city = city;
 		this.description = description;
@@ -59,16 +59,16 @@ public class ReelDTO {
 
 
 	@JsonIgnore
-	public User getUser() {
-		return user;
+	public AppUser getUser() {
+		return appUser;
 	}
 
 	public String getUserId() {
-		return user.getId();
+		return appUser.getId();
 	}
 
-	public void setUser(User user) {
-		this.user = user;
+	public void setUser(AppUser appUser) {
+		this.appUser = appUser;
 	}
 
 

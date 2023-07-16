@@ -1,7 +1,7 @@
 package com.moorabi.reelsapi.DTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.moorabi.reelsapi.model.User;
+import com.moorabi.reelsapi.model.AppUser;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class LikeDTO {
 	private Long Id;
-	private User user;
+	private AppUser appUser;
 	
 
 
@@ -23,12 +23,12 @@ public class LikeDTO {
 
 
 	@JsonIgnore
-	public User getUser() {
-		return user;
+	public AppUser getUser() {
+		return appUser;
 	}
 
 	public String getUserId() {
-		return user.getId();
+		return appUser.getId();
 	}
 
 	

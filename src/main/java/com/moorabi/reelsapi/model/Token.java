@@ -20,6 +20,15 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Token {
 
+	// This Constructor I am using just for Testing purposes so far
+	public Token(String token, TokenType tokenType, boolean expired, boolean revoked, AppUser appUser){
+		this.token = token;
+		this.tokenType = tokenType;
+		this.expired = expired;
+		this.revoked = revoked;
+		this.appUser = appUser;
+	}
+	
 	@Id
 	@GeneratedValue
 	private long id;
@@ -35,6 +44,6 @@ public class Token {
 	
 	@ManyToOne
 	@JoinColumn(name = "user_id")
-	private User user;
+	private AppUser appUser;
 	
 }

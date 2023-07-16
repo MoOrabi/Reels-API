@@ -1,4 +1,4 @@
-package com.moorabi.springboot.crudrestfulwebservices;
+package com.moorabi.reelsapi;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.moorabi.reelsapi.DTO.UserDTO;
 import com.moorabi.reelsapi.exception.ResourceNotFoundException;
-import com.moorabi.reelsapi.model.User;
+import com.moorabi.reelsapi.model.AppUser;
 import com.moorabi.reelsapi.service.UserService;
 
 @RestController
@@ -51,8 +51,8 @@ public class UserController {
 	
 	@PutMapping("/users/{id}")
 	public ResponseEntity<?> updateUser(@RequestHeader (name="Authorization") String token
-			,@RequestBody User user) throws ResourceNotFoundException {
-		return userService.updateUser(token, user);
+			,@RequestBody AppUser appUser) throws ResourceNotFoundException {
+		return userService.updateUser(token, appUser);
 	}
 	
 	@DeleteMapping("/users")

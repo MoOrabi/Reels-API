@@ -13,7 +13,7 @@ import com.moorabi.reelsapi.exception.Errors;
 import com.moorabi.reelsapi.exception.ResourceNotFoundException;
 import com.moorabi.reelsapi.model.Like;
 import com.moorabi.reelsapi.model.Reel;
-import com.moorabi.reelsapi.model.User;
+import com.moorabi.reelsapi.model.AppUser;
 import com.moorabi.reelsapi.repository.LikeRepository;
 import com.moorabi.reelsapi.repository.ReelRepository;
 import com.moorabi.reelsapi.repository.UserRepository;
@@ -43,13 +43,13 @@ public class LikeService {
 		String userName=jwtTokenUtil.getUsernameFromToken(token.split(" ")[1]);
 		
 		Reel r=reelRepository.findById(reel_id).get();
-		User u=userRepository.findUserByUsername(userName);
+		AppUser u=userRepository.findUserByUsername(userName);
 		Like like=new Like(r, u);
 		if(likeRepository.findLike(r, u)==null) {
 			likeRepository.save(like);
 			return ResponseEntity.ok(LikeUtil.convertToDTO(like));
 		}else {
-			return new ResponseEntity<ErrorDetails>(new ErrorDetails(Errors.BAD_REQUEST,"You Already Liked This"),HttpStatus.UNAUTHORIZED);
+			return new ResponseEntity<ErrorDetails>(new ErrorDetails(Errors.BAD_REQUEST,"You Already Liked This"),HttpStatus.BAD_REQUEST);
 					
 		}
 		
@@ -60,7 +60,7 @@ public class LikeService {
 	public ResponseEntity<?> deleteLike(String token,long reel_id) throws ResourceNotFoundException {
 		String userName=jwtTokenUtil.getUsernameFromToken(token.split(" ")[1]);
 		Reel r=reelRepository.findById(reel_id).get();
-		User u=userRepository.findUserByUsername(userName);
+		AppUser u=userRepository.findUserByUsername(userName);
 		if(likeRepository.findLike(r, u)!=null) {
 			Like l=likeRepository.findLike(r, u);
 			likeRepository.delete(l);

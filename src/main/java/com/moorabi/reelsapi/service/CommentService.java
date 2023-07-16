@@ -14,7 +14,7 @@ import com.moorabi.reelsapi.exception.Errors;
 import com.moorabi.reelsapi.exception.ResourceNotFoundException;
 import com.moorabi.reelsapi.model.Comment;
 import com.moorabi.reelsapi.model.Reel;
-import com.moorabi.reelsapi.model.User;
+import com.moorabi.reelsapi.model.AppUser;
 import com.moorabi.reelsapi.repository.CommentRepository;
 import com.moorabi.reelsapi.repository.ReelRepository;
 import com.moorabi.reelsapi.repository.UserRepository;
@@ -56,7 +56,7 @@ public class CommentService {
 			throws ResourceNotFoundException{
 		String userName=jwtTokenUtil.getUsernameFromToken(token.split(" ")[1]);
 		Comment c= commentRepository.findById(comment_id).orElseThrow(() -> new ResourceNotFoundException("Comment not found for this id : "+comment_id));
-		User u=(userRepository.findById((String)c.getUser().getId()))
+		AppUser u=(userRepository.findById((String)c.getUser().getId()))
 				.orElseThrow(() -> new ResourceNotFoundException("User not found for this user name : "+userName));;
 		if(!u.getUsername().equals(userName)) {
 			return new ResponseEntity<ErrorDetails>(new ErrorDetails(Errors.NOT_ALLOWED,"Only Owner of comment can update it"),HttpStatus.UNAUTHORIZED);
@@ -75,7 +75,7 @@ public class CommentService {
 
 		Comment c= commentRepository.findById(comment_id)
 				.orElseThrow(() -> new ResourceNotFoundException("Comment not found for this id : "+comment_id));
-		User u=(userRepository.findById(c.getUser().getId()))
+		AppUser u=(userRepository.findById(c.getUser().getId()))
 				.orElseThrow(() -> new ResourceNotFoundException("User not found for this user name : "+userName));;
 		if(!u.getUsername().equals(userName)) {
 			return new ResponseEntity<ErrorDetails>(new ErrorDetails(Errors.NOT_ALLOWED,"Only Owner of comment can delete it"),HttpStatus.UNAUTHORIZED);

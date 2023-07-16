@@ -24,13 +24,13 @@ public class JwtUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        com.moorabi.reelsapi.model.User user = userRepository.findUserByUsername(username);
+        com.moorabi.reelsapi.model.AppUser appUser = userRepository.findUserByUsername(username);
         List<GrantedAuthority> authorityList = new ArrayList<>();
         authorityList.add(new SimpleGrantedAuthority("USER_ROLE"));
-        if(user ==null) {
+        if(appUser ==null) {
         	throw new UsernameNotFoundException("User not found");
         }
-        return new User(user.getUsername(), user.getPassword(), authorityList);
+        return new User(appUser.getUsername(), appUser.getPassword(), authorityList);
     }
 
     public UserDetails createUserDetails(String username, String password) {

@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.moorabi.reelsapi.exception.ErrorDetails;
+import com.moorabi.reelsapi.model.AppUser;
 import com.moorabi.reelsapi.service.AuthService;
 
 @RestController
@@ -34,7 +36,10 @@ public class AuthController {
                                       @RequestParam("last_name") String lastName,
                                       @RequestParam("user_name") String userName, 
                                       @RequestParam("email") String email,
-                                      @RequestParam("password") String password) {
-        return authService.saveUser(firstName, lastName, userName, email, password);
+                                      @RequestParam("password") String password) throws ErrorDetails {
+    	AppUser appUser = new AppUser(userName, email, password);
+    	appUser.setFirstName(firstName);
+    	appUser.setLastName(lastName);
+        return authService.registerUser(appUser);
     }
 }

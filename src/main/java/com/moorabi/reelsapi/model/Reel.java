@@ -27,11 +27,10 @@ public class Reel {
 	private long id;
 	
 	@ManyToOne(cascade = {CascadeType.DETACH,
-			  CascadeType.PERSIST,
 			  CascadeType.MERGE,
 			  CascadeType.REFRESH})
 	@JoinColumn(name="user_id", nullable=false)
-	private User user;
+	private AppUser appUser;
 	
 	@NotEmpty
 	@Column(name = "country")
@@ -68,10 +67,10 @@ public class Reel {
 	
 	
 	
-	public Reel(long id, User user, @NotEmpty String country, @NotEmpty String city, String description,
+	public Reel(long id, AppUser appUser, @NotEmpty String country, @NotEmpty String city, String description,
 			@NotEmpty byte[] videoFile, List<Comment> comments, List<Like> likes) {
 		this.id = id;
-		this.user = user;
+		this.appUser = appUser;
 		this.country = country;
 		this.city = city;
 		this.description = description;
@@ -81,9 +80,9 @@ public class Reel {
 		this.createdAt=LocalDateTime.now();
 	}
 
-	public Reel(User user, @NotEmpty String country, @NotEmpty String city, String description,
+	public Reel(AppUser appUser, @NotEmpty String country, @NotEmpty String city, String description,
 			@NotEmpty byte[] videoFile) {
-		this.user = user;
+		this.appUser = appUser;
 		this.country = country;
 		this.city = city;
 		this.description = description;
@@ -123,17 +122,17 @@ public class Reel {
 	}
 
 	@JsonIgnore
-	public User getUser() {
-		return user;
+	public AppUser getUser() {
+		return appUser;
 	}
 	
 	@JsonIgnore
 	public String getUserId() {
-		return user.getId();
+		return appUser.getId();
 	}
 
-	public void setUser(User user) {
-		this.user = user;
+	public void setUser(AppUser appUser) {
+		this.appUser = appUser;
 	}
 	
 

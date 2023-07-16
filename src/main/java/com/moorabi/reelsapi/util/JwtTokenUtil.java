@@ -6,10 +6,14 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
+import com.moorabi.reelsapi.model.AppUser;
+import com.moorabi.reelsapi.repository.TokenRepository;
 
 import java.io.Serializable;
 import java.security.Key;
@@ -22,6 +26,9 @@ import java.util.stream.Collectors;
 @Component
 public class JwtTokenUtil implements Serializable {
 
+	@Autowired
+	private TokenRepository tokenRepository;
+	
     /**
 	 * 
 	 */
@@ -94,5 +101,17 @@ public class JwtTokenUtil implements Serializable {
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = getUsernameFromToken(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+    
+    public void revokeAllUserTokens(AppUser appUser) {
+    	var validUserTokens = tokenRepository.findAllValidTokens(appUser.getId());
+    	if (validUserTokens.isEmpty()) {
+    		return;
+    	}
+    	validUserTokens.forEach(t -> {
+    		t.setExpired(true);
+    		t.setRevoked(true);
+    	});
+    	tokenRepository.saveAll(validUserTokens);
     }
 }

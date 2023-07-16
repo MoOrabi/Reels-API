@@ -2,25 +2,29 @@ package com.moorabi.reelsapi.exception;
 
 import java.time.LocalDate;
 
-public class ErrorDetails {
+public class ErrorDetails extends Exception {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	/**
 	 * 
 	 */
 	private LocalDate timestamp;
 	private String code;
+	private String errorTypeMessage;
 	private String message;
-	private String details;
 	
 	public ErrorDetails(Errors errors,String details) {
 		this.timestamp = LocalDate.now();
 		this.code = errors.getCode();
-		this.message = errors.getMessage();
-		this.details=details;
+		this.errorTypeMessage = errors.getMessage();
+		this.message=details;
 	}
 
 
-	public String getDetails() {
-		return details;
+	public String getMessage() {
+		return message;
 	}
 
 	public LocalDate getTimestamp() {
@@ -31,7 +35,7 @@ public class ErrorDetails {
 		return code;
 	}
 
-	public String getMessage() {
-		return message;
+	public String getErrorTypeMessage() {
+		return errorTypeMessage;
 	}
 }

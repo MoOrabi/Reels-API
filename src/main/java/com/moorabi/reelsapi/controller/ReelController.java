@@ -51,7 +51,7 @@ public class ReelController {
 	}
 	
 	@GetMapping("reels/users/{user_id}")
-	public ResponseEntity<List<ReelDTO>> getReelsByUserId(@PathVariable(value="user_id") long id) throws ResourceNotFoundException{
+	public ResponseEntity<List<ReelDTO>> getReelsByUserId(@PathVariable(value="user_id") String id) throws ResourceNotFoundException{
 		return reelService.getReelsByUserId(id);
 	}
 	

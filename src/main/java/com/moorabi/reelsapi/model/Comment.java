@@ -18,11 +18,11 @@ public class Comment {
 	public Comment() {
 		// TODO Auto-generated constructor stub
 	}
-	public Comment(String description, Reel reel, User user) {
+	public Comment(String description, Reel reel, AppUser appUser) {
 		super();
 		this.description = description;
 		this.reel = reel;
-		this.user = user;
+		this.appUser = appUser;
 	}
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -40,7 +40,7 @@ public class Comment {
 //	@JsonManagedReference
 	@ManyToOne 
 	@JoinColumn(name= "user_comments")
-	private User user;
+	private AppUser appUser;
 	
 	public long getId() {
 		return id;
@@ -72,16 +72,16 @@ public class Comment {
 	}
 
 	@JsonIgnore
-	public User getUser() {
-		return user;
+	public AppUser getUser() {
+		return appUser;
 	}
 	
 	public String getUserName() {
-		return user.getUsername();
+		return appUser.getUsername();
 	}
 
-	public void setUser(User user) {
-		this.user = user;
+	public void setUser(AppUser appUser) {
+		this.appUser = appUser;
 	}
 
 	

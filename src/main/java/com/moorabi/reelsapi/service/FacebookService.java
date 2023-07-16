@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import com.moorabi.reelsapi.exception.InternalServerException;
 import com.moorabi.reelsapi.model.Profile;
 import com.moorabi.reelsapi.model.Role;
-import com.moorabi.reelsapi.model.User;
+import com.moorabi.reelsapi.model.AppUser;
 import com.moorabi.reelsapi.model.Facebook.FacebookUser;
 import com.moorabi.reelsapi.util.JwtTokenUtil;
 
@@ -34,8 +34,8 @@ public class FacebookService {
                         new InternalServerException("unable to login facebook user id " + facebookUser.getId()));
     }
 
-    private User convertTo(FacebookUser facebookUser) {
-        return User.builder()
+    private AppUser convertTo(FacebookUser facebookUser) {
+        return AppUser.builder()
                 .id(facebookUser.getId())
                 .email(facebookUser.getEmail())
                 .username(generateUsername(facebookUser.getFirstName(), facebookUser.getLastName()))

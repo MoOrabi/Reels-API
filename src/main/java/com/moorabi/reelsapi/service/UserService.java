@@ -14,7 +14,7 @@ import com.moorabi.reelsapi.exception.Errors;
 import com.moorabi.reelsapi.exception.ResourceNotFoundException;
 import com.moorabi.reelsapi.model.LoginMethodEnum;
 import com.moorabi.reelsapi.model.Role;
-import com.moorabi.reelsapi.model.User;
+import com.moorabi.reelsapi.model.AppUser;
 import com.moorabi.reelsapi.repository.UserRepository;
 import com.moorabi.reelsapi.util.JwtTokenUtil;
 import com.moorabi.reelsapi.util.UserUtil;
@@ -33,21 +33,21 @@ public class UserService {
 		return UserUtil.convertAllToDTO(userRepository.findAll());
 	}
 	
-	public User createUser(User user,  Role role) {
+	public AppUser createUser(AppUser appUser,  Role role) {
 //		if(!PasswordValidator.isValid(user.getPassword())) {
 //			throw new ErrorDetails(Errors.INVALID_INPUT, "Password must be valid");
 //		}
-		user.getRoles().add(role);
-		userRepository.save(user);
-		return user;
+		appUser.getRoles().add(role);
+		userRepository.save(appUser);
+		return appUser;
 	}
 	
-	public Optional<User> findById(String id) {
+	public Optional<AppUser> findById(String id) {
         return userRepository.findById(id);
     }
 	
 	public ResponseEntity<UserDTO> getUserById(String id) throws ResourceNotFoundException{
-		User u=userRepository.findById(id)
+		AppUser u=userRepository.findById(id)
 				.orElseThrow(() -> 
 				new ResourceNotFoundException
 				("User not found for this id : "+id));
@@ -55,7 +55,7 @@ public class UserService {
 	}
 	
 	public ResponseEntity<UserDTO> getUserByUserName(String userName) throws ResourceNotFoundException {
-		User u=userRepository.findUserByUsername(userName);
+		AppUser u=userRepository.findUserByUsername(userName);
 		if(u==null) {
 			throw new ResourceNotFoundException("User not found for this user name : "+userName);
 		}
@@ -63,34 +63,34 @@ public class UserService {
 		return ResponseEntity.ok().body(UserUtil.convertToDTO(u));
 	}
 	
-	public ResponseEntity<?> updateUser(String token,User user) throws ResourceNotFoundException {
+	public ResponseEntity<?> updateUser(String token,AppUser appUser) throws ResourceNotFoundException {
 		String userName=jwtTokenUtil.getUsernameFromToken(token.split(" ")[1]);
-		User u=(userRepository.findUserByUsername(userName));
-		u.setFirstName(user.getFirstName());
-		u.setLastName(user.getLastName());
-		u.setUsername(user.getUsername());
-		u.setEmail(user.getEmail());
-		if(!PasswordValidator.isValid(user.getPassword())) {
+		AppUser u=(userRepository.findUserByUsername(userName));
+		u.setFirstName(appUser.getFirstName());
+		u.setLastName(appUser.getLastName());
+		u.setUsername(appUser.getUsername());
+		u.setEmail(appUser.getEmail());
+		if(!PasswordValidator.isValid(appUser.getPassword())) {
 			return new ResponseEntity<ErrorDetails>(new ErrorDetails(Errors.INVALID_INPUT, "Password must be valid"), 
 					HttpStatus.BAD_REQUEST);
 		}
-		u.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
+		u.setPassword(new BCryptPasswordEncoder().encode(appUser.getPassword()));
 		userRepository.save(u);
 		return ResponseEntity.ok().body(UserUtil.convertToDTO(u));
 	}
 	
 	public ResponseEntity<?> deleteUser(String token) throws ResourceNotFoundException {
 		String userName=jwtTokenUtil.getUsernameFromToken(token.split(" ")[1]);
-		User u=(userRepository.findUserByUsername(userName));
+		AppUser u=(userRepository.findUserByUsername(userName));
 		userRepository.deleteById(u.getId());
 		return ResponseEntity.ok().build();
 	}
 	
 	public void processOAuthPostLogin(String username,String Email) {
-        User existUser = userRepository.findUserByUsername(username);
+        AppUser existUser = userRepository.findUserByUsername(username);
          
         if (existUser == null) {
-            User newUser = new User();
+            AppUser newUser = new AppUser();
             newUser.setUsername(username);
             newUser.setLoginMethodEnum(LoginMethodEnum.FACEBOOK);
             newUser.setPassword("changeme"); 

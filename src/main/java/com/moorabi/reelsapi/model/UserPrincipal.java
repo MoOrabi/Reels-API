@@ -8,11 +8,11 @@ import java.util.Collection;
 import java.util.List;
 
 public class UserPrincipal implements UserDetails {
-    private User mUser;
+    private AppUser mUser;
     public UserPrincipal() {
     }
-    public UserPrincipal(User user) {
-        mUser = user;
+    public UserPrincipal(AppUser appUser) {
+        mUser = appUser;
     }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
