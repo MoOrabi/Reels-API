@@ -23,6 +23,7 @@ import com.moorabi.reelsapi.validator.PasswordValidator;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class AuthService {
@@ -66,6 +67,7 @@ public class AuthService {
 		appUser.setAuthorities("USER");
 		UserDetails userDetails = userDetailsService.createUserDetails(appUser.getUsername(), appUser.getPassword());
 		String jwtToken = jwtTokenUtil.generateToken(userDetails);
+		appUser.setStatus("online");
 		userRepository.save(appUser);
 		tokenService.saveUserToken(appUser, jwtToken);
 		responseMap.put("error", false);
@@ -74,6 +76,25 @@ public class AuthService {
 		responseMap.put("token", jwtToken);
 		return ResponseEntity.ok(responseMap);
 	}
+    
+    public ResponseEntity<?> logout(String token) {
+    	String tokenWithoutBearer = token.split(" ")[1];
+    	String userName = jwtTokenUtil.getUsernameFromToken(tokenWithoutBearer);
+    	AppUser appUser = userRepository.findUserByUsername(userName);
+    	Map<String, Object> responseMap = new HashMap<>();    	
+    	if(appUser.getStatus().equals("online")) {
+    		appUser.setStatus("offline");
+    		userRepository.save(appUser);
+    		jwtTokenUtil.revokeAllUserTokens(appUser);
+    		responseMap.put("Logout", "Sucessful Logout");
+    		return ResponseEntity.ok(responseMap);
+    	}else {
+			responseMap.put("error", true);
+            responseMap.put("message", "User is not active");
+            return ResponseEntity.status(500).body(responseMap);
+		}
+    	
+    }
     
     public ResponseEntity<?> loginUser(String username,
                                        String password) {
@@ -87,6 +108,8 @@ public class AuthService {
                 jwtTokenUtil.revokeAllUserTokens(appUser);
                 String jwtToken = jwtTokenUtil.generateToken(appUser);
                 tokenService.saveUserToken(appUser, jwtToken);
+                appUser.setStatus("online");
+                userRepository.save(appUser);
                 responseMap.put("error", false);
                 responseMap.put("message", "Logged In");
                 responseMap.put("token", jwtToken);
@@ -112,5 +135,54 @@ public class AuthService {
             return ResponseEntity.status(500).body(responseMap);
         }
     }
+    
+    public ResponseEntity<?> loginUserByEmail(String email,
+            String password) {
+	Map<String, Object> responseMap = new HashMap<>();
+	try {
+//	Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email
+//	, password));
+	if (true) {
+	logger.info("Logged In");
+	Optional<AppUser> appUser = userRepository.findByEmail(email);
+	jwtTokenUtil.revokeAllUserTokens(appUser.get());
+	String jwtToken = jwtTokenUtil.generateToken(appUser.get());
+	tokenService.saveUserToken(appUser.get(), jwtToken);
+	appUser.get().setStatus("online");
+	userRepository.save(appUser.get());
+	responseMap.put("error", false);
+	responseMap.put("message", "Logged In");
+	responseMap.put("token", jwtToken);
+	return ResponseEntity.ok(responseMap);
+	} else {
+	responseMap.put("error", true);
+	responseMap.put("message", "Invalid Credentials");
+	return ResponseEntity.status(401).body(responseMap);
+	}
+	} catch (DisabledException e) {
+	e.printStackTrace();
+	responseMap.put("error", true);
+	responseMap.put("message", "User is disabled");
+	return ResponseEntity.status(500).body(responseMap);
+	} catch (BadCredentialsException e) {
+	responseMap.put("error", true);
+	responseMap.put("message", "Invalid Credentials");
+	return ResponseEntity.status(401).body(responseMap);
+	} catch (Exception e) {
+	e.printStackTrace();
+	responseMap.put("error", true);
+	responseMap.put("message", "Something went wrong");
+	return ResponseEntity.status(500).body(responseMap);
+	}
+}
+
+
+	public ResponseEntity<?> loginUserByEmailOrUsername(String email, String password) {
+		if(email.contains("@")) {
+			return loginUserByEmail(email, password);
+		}else {
+			return loginUser(email, password);
+		}
+	}
     
 }

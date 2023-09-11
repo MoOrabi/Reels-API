@@ -53,7 +53,7 @@ public class WebSecurityConfig {
         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
 		.authorizeHttpRequests()
-		.antMatchers("/auth/**","/f/**","/home","/loginf","/css/**","/js/**","/login")
+		.antMatchers("/auth/**","/auth/logine*","/f/**","/home","/loginf","./css/login","./js/login","/login")
         .permitAll()
         .antMatchers(HttpMethod.POST, "/facebook/signin").permitAll()
         .antMatchers("/api/v1/**")

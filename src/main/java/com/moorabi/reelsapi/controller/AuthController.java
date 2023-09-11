@@ -3,6 +3,7 @@ package com.moorabi.reelsapi.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,10 +25,17 @@ public class AuthController {
         
     }
     
+    
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader (name="Authorization") String token) {
+    	return authService.logout(token);
+    }
+    
+    
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestParam("user_name") String username,
+    public ResponseEntity<?> loginUser(@RequestParam("email") String email,
                                        @RequestParam("password") String password) {
-        return authService.loginUser(username, password);
+        return authService.loginUserByEmailOrUsername(email, password);
     }
     
     

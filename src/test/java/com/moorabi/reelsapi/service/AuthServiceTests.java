@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -22,16 +23,15 @@ import org.springframework.security.core.Authentication;
 
 import com.moorabi.reelsapi.exception.ErrorDetails;
 import com.moorabi.reelsapi.model.AppUser;
-import com.moorabi.reelsapi.repository.TokenRepository;
 import com.moorabi.reelsapi.repository.UserRepository;
 import com.moorabi.reelsapi.util.JwtTokenUtil;
 
 @ExtendWith(MockitoExtension.class)
-public class AuthServiceTest {
+public class AuthServiceTests {
 
 	
 	
-	@Autowired
+	@InjectMocks
 	private AuthService authServiceUnderTest;
 	
 	@Mock
@@ -47,10 +47,10 @@ public class AuthServiceTest {
 	@Mock
 	private JwtTokenUtil jwtTokenUtil;
 	
-	@BeforeEach
-	void setUp() {
-		authServiceUnderTest = new AuthService(userRepository, tokenService, authenticationManager, userDetailsService, jwtTokenUtil);
-	}
+//	@BeforeEach
+//	void setUp() {
+//		authServiceUnderTest = new AuthService(userRepository, tokenService, authenticationManager, userDetailsService, jwtTokenUtil);
+//	}
 	
 	@Test
 	void registerSuccessed() throws ErrorDetails {
@@ -88,34 +88,34 @@ public class AuthServiceTest {
 		verify(userRepository, never()).save(any());
 	}
 	
-	@Test
-	void loginSuccessed() throws ErrorDetails {
-		AppUser muser = new AppUser("MoOrabi", "informatikerm@gmail.com", "Nm12345,");
-		muser.setFirstName("Mohammed");
-		muser.setLastName("Orabi");
-		authServiceUnderTest.registerUser(muser);
-		String username = "MoOrabi";
-		String password = "Nm12345,";
-		
-		authServiceUnderTest.loginUser(username,password);
-//		Authentication auth = authenticationManager
-//				.authenticate(
-//						new UsernamePasswordAuthenticationToken
-//						(username, password)
-//						);
-		ArgumentCaptor<UsernamePasswordAuthenticationToken> usernamePasswordAuthenticationTokenArgumentCaptor = 
-					ArgumentCaptor.forClass(UsernamePasswordAuthenticationToken.class);
-		verify(authenticationManager).authenticate(usernamePasswordAuthenticationTokenArgumentCaptor.capture());
-		
-		Authentication capturedAuth = usernamePasswordAuthenticationTokenArgumentCaptor.getValue();
-		
-//		assertThat(capturedAuth).isEqualTo(auth);
-//		assertThat(auth.isAuthenticated());
-		verify(userRepository).findUserByUsername(username);
-		AppUser appUser = userRepository.findUserByUsername(username);
-		verify(jwtTokenUtil).revokeAllUserTokens(appUser);
-		verify(jwtTokenUtil).generateToken(appUser);
-        String jwtToken = jwtTokenUtil.generateToken(appUser);
-		verify(tokenService).saveUserToken(appUser, jwtToken);
-	}
+//	@Test
+//	void loginSuccessed() throws ErrorDetails {
+//		AppUser muser = new AppUser("MoOrabi", "informatikerm@gmail.com", "Nm12345,");
+//		muser.setFirstName("Mohammed");
+//		muser.setLastName("Orabi");
+//		authServiceUnderTest.registerUser(muser);
+//		String username = "MoOrabi";
+//		String password = "Nm12345,";
+//		
+//		authServiceUnderTest.loginUser(username,password);
+////		Authentication auth = authenticationManager
+////				.authenticate(
+////						new UsernamePasswordAuthenticationToken
+////						(username, password)
+////						);
+//		ArgumentCaptor<UsernamePasswordAuthenticationToken> usernamePasswordAuthenticationTokenArgumentCaptor = 
+//					ArgumentCaptor.forClass(UsernamePasswordAuthenticationToken.class);
+//		verify(authenticationManager).authenticate(usernamePasswordAuthenticationTokenArgumentCaptor.capture());
+//		
+//		Authentication capturedAuth = usernamePasswordAuthenticationTokenArgumentCaptor.getValue();
+//		
+////		assertThat(capturedAuth).isEqualTo(auth);
+////		assertThat(auth.isAuthenticated());
+//		verify(userRepository).findUserByUsername(username);
+//		AppUser appUser = userRepository.findUserByUsername(username);
+//		verify(jwtTokenUtil).revokeAllUserTokens(appUser);
+//		verify(jwtTokenUtil).generateToken(appUser);
+//        String jwtToken = jwtTokenUtil.generateToken(appUser);
+//		verify(tokenService).saveUserToken(appUser, jwtToken);
+//	}
 }

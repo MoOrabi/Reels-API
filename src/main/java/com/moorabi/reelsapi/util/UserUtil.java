@@ -29,7 +29,7 @@ public class UserUtil {
     }
 	
 	public static UserDTO convertToDTO(AppUser appUser) {
-		return new UserDTO((String)appUser.getId(),appUser.getEmail(),appUser.getPassword());
+		return new UserDTO((String)appUser.getId(),appUser.getEmail(),appUser.getUsername());
 	}
 
 	public static List<UserDTO> convertAllToDTO(List<AppUser> appUsers){

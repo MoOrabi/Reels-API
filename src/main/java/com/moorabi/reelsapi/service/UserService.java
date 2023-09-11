@@ -30,7 +30,15 @@ public class UserService {
 
 	
 	public List<UserDTO> getAllUsers(){
-		return UserUtil.convertAllToDTO(userRepository.findAll());
+		List<AppUser> users = userRepository.findAll();
+		List<UserDTO> userDTOs = UserUtil.convertAllToDTO(users);
+		return userDTOs;
+	}
+	
+	public List<UserDTO> getOnlineUsers(){
+		List<AppUser> users = userRepository.findAll().parallelStream().filter(u -> u.getStatus().equals("online")).toList();
+		List<UserDTO> userDTOs = UserUtil.convertAllToDTO(users);
+		return userDTOs;
 	}
 	
 	public AppUser createUser(AppUser appUser,  Role role) {
@@ -98,5 +106,22 @@ public class UserService {
             userRepository.save(newUser);        
         }
          
-    }  
+    }
+
+	public ResponseEntity<UserDTO> getUserByUserNameOrEmail(String emailOrUsername) throws ResourceNotFoundException {
+		if(emailOrUsername.contains("@")) {
+			return getUserByEmail(emailOrUsername);
+		}else {
+			return getUserByUserName(emailOrUsername);
+		}
+	}
+
+	private ResponseEntity<UserDTO> getUserByEmail(String email) throws ResourceNotFoundException {
+		Optional<AppUser> u=userRepository.findByEmail(email);
+		if(u.get()==null) {
+			throw new ResourceNotFoundException("User not found for this user name : "+ email);
+		}
+		
+		return ResponseEntity.ok().body(UserUtil.convertToDTO(u.get()));
+	}  
 }

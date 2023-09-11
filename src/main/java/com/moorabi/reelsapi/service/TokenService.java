@@ -1,12 +1,14 @@
 package com.moorabi.reelsapi.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.moorabi.reelsapi.model.Token;
 import com.moorabi.reelsapi.model.TokenType;
 import com.moorabi.reelsapi.model.AppUser;
 import com.moorabi.reelsapi.repository.TokenRepository;
 
+@Service
 public class TokenService {
 
 	@Autowired

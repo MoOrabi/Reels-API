@@ -30,6 +30,11 @@ public class UserController {
 		return userService.getAllUsers();
 	}
 	
+	@GetMapping("/onlineusers")
+	public List<UserDTO> getOnlineUsers(){
+		return userService.getOnlineUsers();
+	}
+	
 //	@PostMapping("/users")
 //	public User createUser(@RequestBody User user) {
 //		userService.createUser(user);
@@ -44,9 +49,9 @@ public class UserController {
 //		System.out.println("Hi");
 //		return userService.getUserById(id);
 //	}
-	@GetMapping("users/un/{userName}")
-	public ResponseEntity<UserDTO> getUserByUserName(@PathVariable(value="userName") String userName) throws ResourceNotFoundException{
-		return userService.getUserByUserName(userName);
+	@GetMapping("users/un/{email}")
+	public ResponseEntity<UserDTO> getUserByUserName(@PathVariable(value="email") String emailOrUsername) throws ResourceNotFoundException{
+		return userService.getUserByUserNameOrEmail(emailOrUsername);
 	}
 	
 	@PutMapping("/users/{id}")

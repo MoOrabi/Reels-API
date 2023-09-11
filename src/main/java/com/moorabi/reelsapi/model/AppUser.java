@@ -70,6 +70,9 @@ public class AppUser implements UserDetails {
 	@Column(name = "authorities")
 	private String authorities;
 	
+	@Column
+	private String status;
+	
 	@Enumerated(EnumType.STRING)
     private LoginMethodEnum loginMethodEnum;
 	
@@ -97,7 +100,8 @@ public class AppUser implements UserDetails {
         this.email = appUser.email;
         this.active = appUser.active;
         this.userProfile = appUser.userProfile;
-        this.roles = appUser.roles;        
+        this.roles = appUser.roles;  
+        this.status=appUser.status;
     }
 
 	public AppUser(@NotBlank @Size(max = 20) String username, @NotBlank String emailId,
@@ -106,6 +110,7 @@ public class AppUser implements UserDetails {
 		this.email = emailId;
 		this.password = password;
 		this.loginMethodEnum=LoginMethodEnum.NATIVE;
+		this.status="online";
 	}
 	
 	public AppUser(@NotBlank @Size(max = 20) String username, @NotBlank String emailId,
@@ -114,6 +119,7 @@ public class AppUser implements UserDetails {
 		this.email = emailId;
 		this.password = password;
 		this.loginMethodEnum = loginMethodEnum;
+		this.status="online";
 	}
 
 	public String getEmail() {
@@ -258,6 +264,14 @@ public class AppUser implements UserDetails {
 
 	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 	
 }

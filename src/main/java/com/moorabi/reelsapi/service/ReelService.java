@@ -35,6 +35,10 @@ public class ReelService {
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
 	
+	public ReelService(ReelRepository reelRepository) {
+		this.reelRepository = reelRepository;
+	}
+
 	public List<ReelDTO> getAllReels(){
 		List<Reel> allReels = reelRepository.findAll();
 		List<ReelDTO> allReelsDTOs = ReelUtil.convertAllToDTO(allReels);
