@@ -89,20 +89,20 @@ function onMessageReceived(payload) {
         message.content = message.sender + ' joined!';
     } else if (message.type === 'LEAVE') {
         messageElement.classList.add('event-message');
-        message.content = message.sender + ' left!';
+        message.content = message.key.sender + ' left!';
     } else {
         messageElement.classList.add('chat-message');
 
         var avatarElement = document.createElement('i');
         // Just take the first letter of sender name to put in avatar
-        var avatarText = document.createTextNode(message.sender[0]);
+        var avatarText = document.createTextNode(message.key.sender.email[0]);
         avatarElement.appendChild(avatarText);
-        avatarElement.style['background-color'] = getAvatarColor(message.sender);
+        avatarElement.style['background-color'] = getAvatarColor(message.key.sender.email);
 
         messageElement.appendChild(avatarElement);
 
         var usernameElement = document.createElement('span');
-        var usernameText = document.createTextNode(message.sender);
+        var usernameText = document.createTextNode(message.key.sender);
         usernameElement.appendChild(usernameText);
         messageElement.appendChild(usernameElement);
     }

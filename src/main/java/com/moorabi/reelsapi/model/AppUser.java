@@ -1,6 +1,7 @@
 package com.moorabi.reelsapi.model;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -206,7 +207,7 @@ public class AppUser implements UserDetails {
 	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-	  return List.of(new SimpleGrantedAuthority(authorities));
+		return Collections.emptyList();
 	}
 
 
