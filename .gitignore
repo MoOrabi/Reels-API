@@ -39,11 +39,12 @@ mysql.sock
 
 .data
 
-*.pem
-*.p12
-*.crt
-**.key
-**.csr
-*.key
-*.csr
-*.ext
+**/*.pem
+**/*.p12
+**/*.crt
+**/**.key
+**/**.org
+**/**.csr
+**/*.key
+**/*.csr
+**/*.ext
