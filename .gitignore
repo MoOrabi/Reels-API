@@ -46,3 +46,4 @@ mysql.sock
 **.csr
 *.key
 *.csr
+*.ext
