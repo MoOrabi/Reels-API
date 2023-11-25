@@ -5,7 +5,7 @@ const videoDiv = document.querySelector('#video-player');
 const videoScreen = document.querySelector('#video-screen');
 
 const queryParams = Object.fromEntries(new URLSearchParams(window.location.search));
-fetch('http://localhost:8081/api/v1/reels')
+fetch('http://localhost:8082/api/v1/reels')
     .then(result => result.json())
     .then(result => {
 

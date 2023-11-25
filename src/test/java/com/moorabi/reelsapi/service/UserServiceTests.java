@@ -56,7 +56,7 @@ public class UserServiceTests {
 	@Test
 	void getUserByIdFound() throws ResourceNotFoundException {
 		String id="1";
-		Optional<AppUser> user=Optional.of(new AppUser(id, "mo", "Ora", "mtlm", "ndjntj@kk.mkf", "ktll", null, null, null, null, null, false, null, null));
+		Optional<AppUser> user=Optional.of(new AppUser(id, "mo", "Ora", "mtlm", "ndjntj@kk.mkf", "ktll", null, false, null, null, null, false, null, null, null));
 		given(userRepository.findById(id)).willReturn(user);
 		assertThat(userService.getUserById(id).getBody()).isNotNull();
 		assertThat(userService.getUserById(id).getBody().getId()).isEqualTo(id);

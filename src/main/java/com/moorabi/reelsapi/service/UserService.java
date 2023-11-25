@@ -36,9 +36,18 @@ public class UserService {
 	}
 	
 	public List<UserDTO> getOnlineUsers(){
-		List<AppUser> users = userRepository.findAll().parallelStream().filter(u -> u.getStatus().equals("online")).toList();
+		setUsersOffline();
+		List<AppUser> users = userRepository.findOnlineUsers();
 		List<UserDTO> userDTOs = UserUtil.convertAllToDTO(users);
 		return userDTOs;
+	}
+	
+	public void setUsersOffline() {
+		List<AppUser> users = userRepository.findUsersWithInvalidToken();
+		users.stream().forEach(u -> {
+			u.setStatus(false);
+			userRepository.save(u);
+		});
 	}
 	
 	public AppUser createUser(AppUser appUser,  Role role) {

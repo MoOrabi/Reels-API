@@ -12,6 +12,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -70,8 +71,8 @@ public class AppUser implements UserDetails {
 	@Column(name = "authorities")
 	private String authorities;
 	
-	@Column
-	private String status;
+	
+	private boolean status;
 	
 	@Enumerated(EnumType.STRING)
     private LoginMethodEnum loginMethodEnum;
@@ -88,6 +89,9 @@ public class AppUser implements UserDetails {
     
     @OneToMany(mappedBy = "name")
     private Set<Role> roles;
+    
+    @ManyToMany(mappedBy = "members")
+    private Set<MessageGroup> messageGroups;
 	
 	public AppUser() {
 		
@@ -110,7 +114,7 @@ public class AppUser implements UserDetails {
 		this.email = emailId;
 		this.password = password;
 		this.loginMethodEnum=LoginMethodEnum.NATIVE;
-		this.status="online";
+		this.status=true;
 	}
 	
 	public AppUser(@NotBlank @Size(max = 20) String username, @NotBlank String emailId,
@@ -119,7 +123,7 @@ public class AppUser implements UserDetails {
 		this.email = emailId;
 		this.password = password;
 		this.loginMethodEnum = loginMethodEnum;
-		this.status="online";
+		this.status=true;
 	}
 
 	public String getEmail() {
@@ -266,11 +270,11 @@ public class AppUser implements UserDetails {
 		this.roles = roles;
 	}
 
-	public String getStatus() {
+	public boolean getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(boolean status) {
 		this.status = status;
 	}
 	

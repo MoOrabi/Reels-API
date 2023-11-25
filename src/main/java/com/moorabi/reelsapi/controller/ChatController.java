@@ -5,6 +5,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import com.moorabi.reelsapi.model.ChatMessage;
 
@@ -26,7 +27,7 @@ public class ChatController {
             SimpMessageHeaderAccessor headerAccessor
     ) {
         // Add username in web socket session
-        headerAccessor.getSessionAttributes().put("username", chatMessage.getSender());
+        headerAccessor.getSessionAttributes().put("username", chatMessage.getKey().getSender());
         return chatMessage;
     }
 }

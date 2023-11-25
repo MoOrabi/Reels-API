@@ -28,9 +28,9 @@ function handleLogin(event) {
     }).then((response) => {
 		
         localStorage.setItem("token", 'Bearer '+response.token);
-        
+        getUserInfo(email);
         window.location.href = 'index.html'
-		getUserInfo(email);
+		
         
     }).catch(error => {
         console.error('POST request error', error);
@@ -39,6 +39,7 @@ function handleLogin(event) {
 }
 
 function getUserInfo(email) {
+	alert(email);
 	fetch('https://localhost:8082/api/v1/users/un/' + email.toLowerCase(), {
         method: 'GET',
         headers: {
@@ -56,3 +57,4 @@ function getUserInfo(email) {
 
 const loginForm = document.getElementById("loginForm");
 loginForm.addEventListener("submit", handleLogin);
+

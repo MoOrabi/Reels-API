@@ -16,7 +16,7 @@ function handleRegistration(event) {
         password: password
     };
     fetch('https://localhost:8082/auth/register?' + new URLSearchParams({
-	    first_name:'Mohammed',
+	first_name:'Mohammed',
         last_name:'Orabi',
         user_name: username,
         email: email,

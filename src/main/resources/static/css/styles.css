@@ -79,3 +79,14 @@ body {
 .user-email {
     font-size: 15px !important;
 }
+
+.social-container {
+	display: flex;
+	justify-content: space-between;
+}
+
+#sign-in-container {
+
+	border: solid maroon 2px;
+	border-radius: 2px;
+}

@@ -1,33 +1,32 @@
 package com.moorabi.reelsapi.config;
 
-import com.moorabi.reelsapi.service.UserService;
-import com.moorabi.reelsapi.util.JwtRequestFilter;
-
-import lombok.RequiredArgsConstructor;
-
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+
+import com.moorabi.reelsapi.service.UserService;
+import com.moorabi.reelsapi.util.JwtRequestFilter;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
@@ -45,22 +44,34 @@ public class WebSecurityConfig {
 		
 		
 		http
+		.requiresChannel(channel -> 
+        					channel.anyRequest().requiresSecure())
 		.cors()
+		.configurationSource(request -> {
+            CorsConfiguration config = new CorsConfiguration();
+            config.setAllowedOrigins (List.of("https://localhost:4200"));
+            config.setAllowedMethods (List.of("*"));
+            config.setAllowCredentials (true);
+            config.setAllowedHeaders (List.of("*"));
+            config.setMaxAge (2500L);
+            return config;
+        })
 		.and()
 		.csrf()
 		.disable()
-		.sessionManagement()
-        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        .and()
+		
 		.authorizeHttpRequests()
 		.antMatchers("/auth/**","/auth/logine*","/f/**","/home","/loginf","./css/login","./js/login","/login")
         .permitAll()
-        .antMatchers(HttpMethod.POST, "/facebook/signin").permitAll()
         .antMatchers("/api/v1/**")
         .authenticated()
         
-        .and()
         
+        
+        .and()       
+        .sessionManagement()
+        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        .and()
 		.authenticationProvider(authenticationProvider)
 		.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
 		
@@ -69,68 +80,18 @@ public class WebSecurityConfig {
 		.addLogoutHandler(logoutHandler)
 		.logoutSuccessHandler(
 				(request, response, authentication) -> 
-				SecurityContextHolder.clearContext());
-		
+				SecurityContextHolder.clearContext())
 		;
+		
 		
 		return http.build();
 	}
 	
-	
-    
-//	@Bean
-//	@Order(1)
-//	public SecurityFilterChain oAuthSecurityFilterChain(HttpSecurity http) throws Exception {
-//		
-//		
-//		http
-//        .csrf()
-//        .disable()
-//        .authorizeHttpRequests()
-//        .anyRequest()
-//        .authenticated()
-//        .and()
-//        .oauth2Login()
-//        .loginPage("/loginf")
-//        .userInfoEndpoint()
-//        .userService(oauth2UserService)
-//        .and()
-//        .successHandler((AuthenticationSuccessHandler) new AuthenticationSuccessHandler() {
-//        	 
-//            @Override
-//            public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-//                    Authentication authentication) throws IOException, ServletException {
-//     
-//                CustomOAuth2User oauthUser = (CustomOAuth2User) authentication.getPrincipal();
-//     
-//                userService.processOAuthPostLogin(oauthUser.getAttribute("username") ,oauthUser.getEmail());
-//     
-//                response.sendRedirect("/api/v1/reels");
-//            }
-//
-//			
-//        })
-//    ;
-//		return http.build();
-//	}
-
 	@Bean
-    public CorsFilter corsFilter() {
-        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        final CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedOrigin("*");
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("OPTIONS");
-        config.addAllowedMethod("HEAD");
-        config.addAllowedMethod("GET");
-        config.addAllowedMethod("PUT");
-        config.addAllowedMethod("POST");
-        config.addAllowedMethod("DELETE");
-        config.addAllowedMethod("PATCH");
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
+    public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService() {
+        return new CustomOAuth2UserService();
     }
-
+	
+ 
    
 }

@@ -3,9 +3,15 @@ let connectedUser = localStorage.getItem('connectedUser');
 let connectedUserJson = JSON.parse(connectedUser);
 function loadAndDisplayUsers() {
 
+
     // check if the user is connected
-    
-    if (!connectedUser) {
+    if (!token) {
+        window.location = 'login.html';
+        return;
+	}
+    const tokenWithoutBearer = token.split(' ')[1];
+    const jwtPayload = JSON.parse(window.atob(tokenWithoutBearer.split('.')[1]))
+    if (jwtPayload.exp === 5 * 60 * 60 * 1000) {
         window.location = 'login.html';
         return;
     }
@@ -16,6 +22,7 @@ function loadAndDisplayUsers() {
     const userListElement = document.getElementById("userList");
     // Clear any existing content in the userListElement
     userListElement.innerHTML = "Loading...";
+    console.log(token)
     // Retrieve the userList from Local Storage
     fetch('https://localhost:8082/api/v1/onlineusers',{
 		method: 'GET',
@@ -80,11 +87,11 @@ function handleLogout() {
         },
     })
         .then((response) => {
-			localStorage.removeItem('connectedUser');
-			localStorage.removeItem('token');
-            return response;
+			return response;
         })
         .then((data) => {
+			localStorage.removeItem('connectedUser');
+			localStorage.removeItem('token');
             window.location.href = "login.html";
         });
 }

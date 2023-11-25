@@ -3,19 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="no-referrer-when-downgrade">
+  <meta name="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
   <title>Login Page</title>
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  
 </head>
 <body>
+<div id="fb-root"></div>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v18.0&appId=486206640184103&autoLogAppEvents=1" nonce="vuyLUL8I"></script>
 <div class="container">
-  <div class="social-icons">
-    <h2>Join Us</h2>
-    <a href="#" target="_blank"><i class="fa fa-instagram"></i></a>
-    <a href="#" target="_blank"><i class="fa fa-facebook"></i></a>
-    <a href="#" target="_blank"><i class="fa fa-linkedin"></i></a>
-    <a href="#" target="_blank"><i class="fa fa-github"></i></a>
-  </div>
+  
   <div class="login-form">
     <h2>Login</h2>
     <form id="loginForm">
@@ -28,8 +27,61 @@
       <button type="submit">Login</button>
     </form>
     <p>Don't have an account? <a href="register.html">Register</a></p>
+    <div class="social-container">
+    	<div id="sign-in-container">
+	    	<div id="g_id_onload"
+			     data-client_id="30944815160-5e53ash14ooj8fq4o311cjsrh8p2npic.apps.googleusercontent.com"
+			     data-context="signin"
+			     data-ux_mode="popup"
+			     data-callback="handleCredentialResponse"
+			     data-auto_prompt="false">
+			</div>
+			
+			<div class="g_id_signin"
+			     data-type="standard"
+			     data-shape="rectangular"
+			     data-theme="outline"
+			     data-text="signin_with"
+			     data-size="large"
+			     data-logo_alignment="left">
+			</div>
+	    </div>
+	    
+	   	<div id="spinner" class="fb"
+		    style="
+		    	position: relative;
+		    	left: -70px;
+		        background: #4267b2;
+		        border-radius: 5px;
+		        color: white;
+		        height: 28px;
+		        text-align: center;
+		        width: 200px;">
+		    <div
+			    class="fb-login-button"
+			    data-max-rows="1"
+			    data-size="large"
+			    data-button-type="continue_with"
+			    data-use-continue-as="true"
+			    onlogin="checkLoginState"
+			    
+		        
+		   	></div>
+		</div>
+    </div>
+    
   </div>
 </div>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="/js/login.js"></script>
+<script src="/js/social.js" defer></script>
+<script>
+var finished_rendering = function() {
+  console.log("finished rendering plugins");
+  var spinner = document.getElementById("spinner");
+  spinner.removeAttribute("style");
+  spinner.removeChild(spinner.childNodes[0]);
+}
+</script>
 </body>
 </html>
