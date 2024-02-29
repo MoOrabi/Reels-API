@@ -26,7 +26,7 @@ public class ChatMessageKey implements Serializable {
 	private AppUser sender;
 	
 	@ManyToOne
-	private AppUser receiver;
+	private AppUser reciever;
 	
 	@Column(nullable = false)
 	private Date sentAt;

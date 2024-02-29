@@ -25,7 +25,7 @@ public class ChatMessage extends Message {
 	 	   			AppUser sender, AppUser reciever,
 	 	   			Date sentAt, Date readAt) {
 	    super(type,content, readAt);
-	    this.key.setReceiver(reciever);
+	    this.key.setReciever(reciever);
 	    this.key.setSender(sender);
 	    this.key.setSentAt(sentAt);
     }

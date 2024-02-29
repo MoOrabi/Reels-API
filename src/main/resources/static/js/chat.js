@@ -72,6 +72,7 @@ function sendMessage(event) {
             content: messageInput.value,
             type: 'CHAT'
         };
+        console.log(chatMessage)
         stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(chatMessage));
         messageInput.value = '';
     }
@@ -80,29 +81,30 @@ function sendMessage(event) {
 
 
 function onMessageReceived(payload) {
+	console.log(payload)
     var message = JSON.parse(payload.body);
-
+	console.log(message)
     var messageElement = document.createElement('li');
 
     if(message.type === 'JOIN') {
         messageElement.classList.add('event-message');
-        message.content = message.sender + ' joined!';
+        message.content = message.sender.username + ' joined!';
     } else if (message.type === 'LEAVE') {
         messageElement.classList.add('event-message');
-        message.content = message.key.sender + ' left!';
+        message.content = message.sender.username + ' left!';
     } else {
         messageElement.classList.add('chat-message');
 
         var avatarElement = document.createElement('i');
         // Just take the first letter of sender name to put in avatar
-        var avatarText = document.createTextNode(message.key.sender.email[0]);
+        var avatarText = document.createTextNode(message.sender.username[0]);
         avatarElement.appendChild(avatarText);
-        avatarElement.style['background-color'] = getAvatarColor(message.key.sender.email);
+        avatarElement.style['background-color'] = getAvatarColor(message.sender.username);
 
         messageElement.appendChild(avatarElement);
 
         var usernameElement = document.createElement('span');
-        var usernameText = document.createTextNode(message.key.sender);
+        var usernameText = document.createTextNode(message.sender.username);
         usernameElement.appendChild(usernameText);
         messageElement.appendChild(usernameElement);
     }

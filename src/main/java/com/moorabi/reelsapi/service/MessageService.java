@@ -29,7 +29,7 @@ public class MessageService {
     public void sendMessage(ChatMessage message) {
 
         chatMessageRepository.save(message);
-        simpMessagingTemplate.convertAndSend("/topic/messages/" + message.getKey().getReceiver().getId(), message);
+        simpMessagingTemplate.convertAndSend("/topic/messages/" + message.getKey().getReciever().getId(), message);
 
     }
     

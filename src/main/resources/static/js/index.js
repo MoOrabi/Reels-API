@@ -46,11 +46,11 @@ function displayUsers(userList, userListElement) {
     // Loop through the userList and create list items to display each user
     userList.forEach(user => {
         const listItem = document.createElement("li");
-        if(user.userName===connectedUserJson.userName){
+        if(user.username===connectedUserJson.username){
 			listItem.innerHTML = `
                 <div style="color:blue;">
                     <i class="fa fa-user-circle"></i>
-                    ${user.userName} <i class="user-email">(${user.email})</i>
+                    ${user.username} <i class="user-email">(${user.email})</i>
                 </div>
                 <i class="fa fa-lightbulb-o ${user.status === "online" ? "online" : "offline"}"></i>
             `;
@@ -61,7 +61,7 @@ function displayUsers(userList, userListElement) {
 			listItem.innerHTML = `
                 <div class="userDiv">
                     <i class="fa fa-user-circle"></i>
-                    ${user.userName} <i class="user-email">(${user.email})</i>
+                    ${user.username} <i class="user-email">(${user.email})</i>
                 </div>
                 <i class="fa fa-lightbulb-o ${user.status === "online" ? "online" : "offline"}"></i>
             `;
@@ -109,7 +109,7 @@ chatBtn.addEventListener("click", () => {
 function handleNewMeeting() {
     const connectedUser = JSON.parse(localStorage.getItem('connectedUser'));
     console.log(connectedUser);
-    window.open(`videocall.html?username=${connectedUser.userName}`, "_blank");
+    window.open(`videocall.html?username=${connectedUser.username}`, "_blank");
 }
 
 // Attach the handleNewMeeting function to the "Create a New Meeting" button
@@ -121,7 +121,7 @@ function handleJoinMeeting() {
     const roomId = document.getElementById("meetingName").value;
     const connectedUser = JSON.parse(localStorage.getItem('connectedUser'));
 	
-    const url = `videocall.html?roomID=${roomId}&username=${connectedUser.userName}`;
+    const url = `videocall.html?roomID=${roomId}&username=${connectedUser.username}`;
 
     window.open(url, "_blank");
 }

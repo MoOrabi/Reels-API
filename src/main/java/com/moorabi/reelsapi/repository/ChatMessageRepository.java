@@ -13,8 +13,8 @@ import com.moorabi.reelsapi.model.ChatMessage;
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
 
 	@Query("select M from ChatMessage M "
-			+ "where (M.key.sender.id=:from and M.key.receiver.id=:to) "
-			+ "or (M.key.sender.id=:to and M.key.receiver.id=:from) ")
+			+ "where (M.key.sender.id=:from and M.key.reciever.id=:to) "
+			+ "or (M.key.sender.id=:to and M.key.reciever.id=:from) ")
 	List<ChatMessage> findForPersonalChat(Integer from, Integer to);
 	
 	

@@ -29,6 +29,7 @@ function handleLogin(event) {
 		
         localStorage.setItem("token", 'Bearer '+response.token);
         getUserInfo(email);
+        alert("Hi")
         window.location.href = 'index.html'
 		
         
